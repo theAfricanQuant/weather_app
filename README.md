@@ -4,9 +4,7 @@ A Pythonista-friendly, step-by-step Rust course built around the weather app in 
 
 ## Read the lessons online
 
-After the first successful GitHub Pages deployment, put the live URL here:
-
-**Course site:** `https://OWNER.github.io/REPOSITORY/` *(replace OWNER and REPOSITORY after we create the GitHub repo)*
+**Course site:** <https://www.sisengai.com/weather_app/>
 
 Readers can open that site directly in a browser; they do not need to clone the Rust crate. The site is deployed from the course HTML by [`.github/workflows/pages.yml`](.github/workflows/pages.yml).
 
