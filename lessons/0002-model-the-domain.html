@@ -85,6 +85,42 @@ LocationQuery = CityState | Coordinates</code></pre>
     </section>
 
     <section class="tech-card card-pad">
+      <h2>Code along: give a weather request a Rust shape</h2>
+      <p>We will create one module file, then use its types from <code>main.rs</code>. In Zed's file tree, right-click the <code>src</code> folder and choose <strong>New File</strong>. Name it <code>models.rs</code>. Replace its contents with:</p>
+      <pre><code>#[derive(Debug)]
+pub enum LocationQuery {
+    CityState { city: String, state: String },
+    Coordinates { latitude: f64, longitude: f64 },
+}
+
+#[derive(Debug)]
+pub struct WeatherQueryRequest {
+    pub location: LocationQuery,
+    pub start_date: String,
+    pub end_date: String,
+}</code></pre>
+      <p>Now replace all of <code>src/main.rs</code>. In Zed Vim mode, use <code>Esc</code>, <code>gg</code>, <code>dG</code>, then <code>i</code>; paste this block with <strong>Edit → Paste</strong>, then save with <code>Esc</code>, <code>:w</code>, <code>Enter</code>.</p>
+      <pre><code>mod models;
+
+use models::{LocationQuery, WeatherQueryRequest};
+
+fn main() {
+    let request = WeatherQueryRequest {
+        location: LocationQuery::CityState {
+            city: String::from("Lagos"),
+            state: String::from("Lagos"),
+        },
+        start_date: String::from("2026-10-21"),
+        end_date: String::from("2026-10-22"),
+    };
+
+    println!("{request:#?}");
+}</code></pre>
+      <p>Save both files, then run <code>cargo run</code> in the project folder. The terminal should print the request and its nested <code>CityState</code> value. <code>mod models;</code> connects <code>src/models.rs</code> to the crate; <code>use</code> brings its names into this file. The <code>pub</code> keywords allow the parent module to use items declared inside <code>models</code>. The dates are strings for now; Lesson 4 will validate user text before we treat it as a request.</p>
+      <div class="callout"><strong>Pythonista lens:</strong> <code>models.rs</code> is roughly like a Python module, but Rust does not include every file just because it exists. We declare the module with <code>mod models;</code>. The enum is like a carefully shaped set of alternatives: a location is either a city/state pair or coordinates. <code>String::from</code> creates owned Rust strings; Python manages string lifetimes for you, while Rust will make ownership rules explicit as we use values.</div>
+    </section>
+
+    <section class="tech-card card-pad">
       <h2>Watch and read</h2>
       <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=257s" target="_blank" rel="noopener noreferrer">Video: the model types, around 4:17</a>. Use the source file as the exact reference if the spoken chapter label and timestamp do not line up perfectly.</p>
       <p>Primary reference: <a href="https://doc.rust-lang.org/book/ch06-01-defining-an-enum.html" target="_blank" rel="noopener noreferrer">Rust Book: defining an enum</a>. Next, <a href="0003-app-state.html" target="_blank" rel="noopener noreferrer">we put these types into app state</a>.</p>

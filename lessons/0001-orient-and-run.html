@@ -80,6 +80,18 @@ if __name__ == "__main__":
     </section>
 
     <section class="tech-card card-pad">
+      <h2>Code along: edit and run our Rust entry point</h2>
+      <p>Now we write and run a small piece of Rust in our own crate. Open <code>src/main.rs</code> in Zed. This replaces Cargo's starter program, so use it only when the open file is our crate's <code>src/main.rs</code>.</p>
+      <p><strong>In Zed Vim mode:</strong> press <code>Esc</code>, then <code>gg</code> to go to the first line, then <code>dG</code> to delete from there to the end of the file. Press <code>i</code>, paste the complete Rust block below using Zed's <strong>Edit → Paste</strong> command, press <code>Esc</code>, then type <code>:w</code> and press <code>Enter</code> to save.</p>
+      <pre><code>fn main() {
+    println!("Weather app crate is running!");
+}</code></pre>
+      <p>Back in the terminal, run:</p>
+      <pre><code>cargo run</code></pre>
+      <p>You should see <code>Weather app crate is running!</code>. <code>fn main()</code> is where this executable starts. <code>println!</code> prints a line; the exclamation mark tells us it is a Rust macro. Cargo compiles this file and then runs the program. Python's <code>print()</code> does not have a separate compile step like this.</p>
+    </section>
+
+    <section class="tech-card card-pad">
       <h2>Watch and read</h2>
       <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=134s" target="_blank" rel="noopener noreferrer">Video: main.rs and module setup, around 2:14</a>. The published chapter list labels sections slightly differently; use the linked source when you want to verify a detail.</p>
       <p>Primary reference: <a href="https://docs.rs/eframe/latest/eframe/fn.run_native.html" target="_blank" rel="noopener noreferrer">eframe run_native</a> explains the native startup function. The <a href="../reference/project-map.html" target="_blank" rel="noopener noreferrer">printable project map</a> is a quick reminder.</p>

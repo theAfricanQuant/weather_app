@@ -32,13 +32,13 @@
     </section>
 
     <section class="tech-card card-pad">
-      <h2>The change</h2>
-      <p>Add Boston, Massachusetts as a seventh quick city. It is deliberately small: the data list changes, while the existing loop supplies the button and copies the selection into the input fields. This capstone practices finding the right module instead of rewriting working UI code.</p>
+      <h2>The reference app's change</h2>
+      <p>In the linked GUI app, add Boston, Massachusetts as a seventh quick city. This upstream example shows how the data list feeds an existing button loop. It is for reading and comparison; our local crate does not contain that GUI source. The runnable exercise for your crate is in the “Code along” section below.</p>
       <pre><code>QuickCity {
     city: "Boston",
     state: "MA",
 },</code></pre>
-      <p>Add that entry to <code>QUICK_CITIES</code> and change its declared array length from 6 to 7. Keep the six existing entries in place; the array's declared length must match its number of entries. The geocoder searches US city/state results, so this location fits the app's current limitation.</p>
+      <p>In the reference repository, add that entry to <code>QUICK_CITIES</code> and change its declared array length from 6 to 7. Keep the six existing entries in place; the array's declared length must match its number of entries. The geocoder searches US city/state results, so this location fits the reference app's current limitation. Do not paste this reference-only snippet into your local crate.</p>
       <div class="callout"><strong>Pythonista lens — the array length is part of its type:</strong> A Python list can grow when you append an item. A Rust array has a fixed length recorded in its type, so <code>[QuickCity; 6]</code> and <code>[QuickCity; 7]</code> are different types. We update both the declared length and the entries so the compiler can confirm they agree. This is a small example of Rust asking us to state a constraint once, then checking it for us. If the length does not match, the compiler points to the mismatch before the app runs.</div>
       <details class="python-example">
         <summary>Pythonista comparison: grow a list</summary>
@@ -53,24 +53,60 @@ quick_cities.append(
     </section>
 
     <section class="tech-card card-pad">
-      <h2>Your build sequence</h2>
+      <h2>Build sequence for your crate</h2>
       <ol>
-        <li>Open <code>source/src/models.rs</code> and find <code>QUICK_CITIES</code>.</li>
-        <li>Change the array length from 6 to 7 and add the Boston entry after the existing cities.</li>
-        <li>Run <code>cargo check</code> from <code>source/</code>. Fix any type or syntax error before launching.</li>
-        <li>Run <code>cargo run</code>. Confirm the new button appears and selects Boston, MA.</li>
-        <li>Use “Get Weather” if you have network access. The request should go through the existing city geocoder and worker flow.</li>
+        <li>Create <code>src/bin/lesson_10.rs</code> and run <code>cargo run --bin lesson_10</code>. Confirm that four cities print.</li>
+        <li>Add a fifth <code>QuickCity</code> entry and change <code>[QuickCity; 4]</code> to <code>[QuickCity; 5]</code>.</li>
+        <li>Run <code>cargo run --bin lesson_10</code> again. Confirm all five entries print.</li>
+        <li>Optional compiler demonstration: change the array length to 6 without adding an entry, then run <code>cargo check --bin lesson_10</code>. Read the length mismatch, undo the edit with <code>u</code> in Zed Vim mode, and save.</li>
+        <li>Open the linked upstream <code>models.rs</code> and <code>app.rs</code> in their new tabs. Trace how that full GUI app turns its list into buttons. The upstream folder is separate; our local project uses <code>src/bin/lesson_10.rs</code>.</li>
       </ol>
-      <div class="callout"><strong>Success criteria:</strong> it compiles, the preset button appears, selecting it fills the two text fields, and you can explain why no new drawing method was needed.</div>
+      <div class="callout"><strong>Success criteria:</strong> your local mini-program prints five cities, and you can explain why Rust needs the array length and entry count to agree. In the reference app, a separate UI loop turns each city into a button.</div>
       <details class="answer-note">
         <summary>Hints after your attempt</summary>
-        <p><code>draw_quick_city_buttons</code> iterates over <code>QUICK_CITIES</code>, creates each button, sets <code>InputMode::CityState</code>, and copies the selected city and state into app state. The existing draw method handles the new item automatically.</p>
+        <p>The local <code>main</code> loops over <code>QUICK_CITIES</code> with <code>.iter().enumerate()</code>. The compiler compares the declared array length with the number of entries before the program runs.</p>
       </details>
     </section>
 
     <section class="tech-card card-pad">
+      <h2>Code along: add one city and let the compiler check the array</h2>
+      <p>Create <code>src/bin/lesson_10.rs</code> and paste this complete program. It is a tiny console version of a preset-city list, so you can see the fixed array length rule before comparing it with the GUI reference.</p>
+      <pre><code>#[derive(Debug)]
+struct QuickCity {
+    city: &amp;'static str,
+    state: &amp;'static str,
+}
+
+const QUICK_CITIES: [QuickCity; 4] = [
+    QuickCity {
+        city: "Boston",
+        state: "MA",
+    },
+    QuickCity {
+        city: "Chicago",
+        state: "IL",
+    },
+    QuickCity {
+        city: "Denver",
+        state: "CO",
+    },
+    QuickCity {
+        city: "Seattle",
+        state: "WA",
+    },
+];
+
+fn main() {
+    for (index, city) in QUICK_CITIES.iter().enumerate() {
+        println!("{}. {}, {}", index + 1, city.city, city.state);
+    }
+}</code></pre>
+      <p>Run <code>cargo run --bin lesson_10</code>. Then add one <code>QuickCity</code> entry and change the declared length from <code>4</code> to <code>5</code>. Run it again. If you change only the number, Rust reports that the array length and entries do not match. Python's list would grow dynamically; Rust checks the fixed count in the array's type.</p>
+    </section>
+
+    <section class="tech-card card-pad">
       <h2>Close the loop</h2>
-      <p>Without looking at the course map, trace the new click through the app: constant → button loop → input state → request validation → worker → geocoder → weather result. Tell me where you would look first if the button appeared but the request failed.</p>
+      <p>After your local list exercise, compare it with the full reference app. Trace one preset through the GUI: constant → button loop → input state → request validation → worker → geocoder → weather result. Tell me where you would look first if the reference button appeared but its request failed.</p>
       <p>Open <a href="https://github.com/feenix100/rusty_weather/blob/main/src/models.rs" target="_blank" rel="noopener noreferrer">models.rs</a> and <a href="https://github.com/feenix100/rusty_weather/blob/main/src/app.rs" target="_blank" rel="noopener noreferrer">app.rs</a>. Keep this as your first reference for adding another preset or extending the app.</p>
       <p class="small-note">When you share your attempt or explain the flow, I can record the concepts you have demonstrated and shape the next lesson around them.</p>
     </section>

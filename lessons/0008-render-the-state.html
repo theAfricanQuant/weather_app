@@ -69,6 +69,41 @@
     </section>
 
     <section class="tech-card card-pad">
+      <h2>Code along: render both empty and loaded states</h2>
+      <p>Create <code>src/bin/lesson_08.rs</code> and paste this complete terminal example. It turns the current data into display text, including the case where no result has arrived yet.</p>
+      <pre><code>struct WeatherDayRecord {
+    date: String,
+    high_c: Option&lt;f64&gt;,
+}
+
+fn render_day(record: Option&lt;&amp;WeatherDayRecord&gt;) -&gt; String {
+    match record {
+        None =&gt; String::from("No weather result yet."),
+        Some(day) =&gt; {
+            let high = match day.high_c {
+                Some(value) =&gt; format!("{value:.1} °C"),
+                None =&gt; String::from("High temperature unavailable"),
+            };
+
+            format!("{} · high: {high}", day.date)
+        }
+    }
+}
+
+fn main() {
+    let no_result: Option&lt;&amp;WeatherDayRecord&gt; = None;
+    println!("{}", render_day(no_result));
+
+    let day = WeatherDayRecord {
+        date: String::from("2026-10-21"),
+        high_c: Some(31.5),
+    };
+    println!("{}", render_day(Some(&amp;day)));
+}</code></pre>
+      <p>Run <code>cargo run --bin lesson_08</code>. First it prints the empty-state message; then it prints the date and temperature. The helper borrows the record as <code>&amp;WeatherDayRecord</code>, so it can read the data without taking ownership of it. A desktop GUI draws widgets instead of printing lines, but it still chooses what to show from the current state.</p>
+    </section>
+
+    <section class="tech-card card-pad">
       <h2>Watch and read</h2>
       <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=1113s" target="_blank" rel="noopener noreferrer">Video: drawing the interface, around 18:33–25:08</a> · <a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=2264s" target="_blank" rel="noopener noreferrer">Video: the app update loop, around 37:44–39:02</a>.</p>
       <p>Primary reference: <a href="https://docs.rs/eframe/latest/eframe/trait.App.html" target="_blank" rel="noopener noreferrer">eframe App</a>. Next: <a href="0009-history-and-export.html" target="_blank" rel="noopener noreferrer">keep searches after the window closes</a>.</p>

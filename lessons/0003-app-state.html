@@ -82,6 +82,58 @@ class AppState:
     </section>
 
     <section class="tech-card card-pad">
+      <h2>Code along: store the app's current state</h2>
+      <p>First, update <code>src/models.rs</code> by adding this type at the bottom. In Zed Vim mode, press <code>Esc</code>, then <code>G</code> to go to the last line, then <code>o</code> to open a new line below and paste the block with <strong>Edit → Paste</strong>. Save with <code>Esc</code>, <code>:w</code>, <code>Enter</code>.</p>
+      <pre><code>#[derive(Debug)]
+pub struct WeatherQueryResult {
+    pub location: String,
+    pub temperature_c: Option&lt;f64&gt;,
+}</code></pre>
+      <p>Create <code>src/app_state.rs</code> from the <code>src</code> folder in Zed's file tree, and put this code in it:</p>
+      <pre><code>use crate::models::WeatherQueryResult;
+
+#[derive(Debug)]
+pub struct AppState {
+    pub input_location: String,
+    pub loading: bool,
+    pub latest_result: Option&lt;WeatherQueryResult&gt;,
+    pub status: String,
+}
+
+impl AppState {
+    pub fn new() -&gt; Self {
+        Self {
+            input_location: String::from("Lagos"),
+            loading: false,
+            latest_result: None,
+            status: String::from("Ready"),
+        }
+    }
+}</code></pre>
+      <p>Now replace all of <code>src/main.rs</code> with this, using <code>Esc</code>, <code>gg</code>, <code>dG</code>, <code>i</code>, <strong>Edit → Paste</strong>, then <code>Esc</code>, <code>:w</code>, <code>Enter</code>:</p>
+      <pre><code>mod app_state;
+mod models;
+
+use app_state::AppState;
+use models::WeatherQueryResult;
+
+fn main() {
+    let mut state = AppState::new();
+    println!("Starting state:\n{state:#?}");
+
+    state.latest_result = Some(WeatherQueryResult {
+        location: String::from("Lagos, Nigeria"),
+        temperature_c: Some(31.0),
+    });
+    state.status = String::from("Weather loaded");
+
+    println!("Updated state:\n{state:#?}");
+}</code></pre>
+      <p>Save all three files and run <code>cargo run</code>. First, the output shows <code>latest_result: None</code>; after our update it shows <code>Some(...)</code>. We use <code>let mut</code> because this code changes the state after creating it. In Python you can usually reassign an object attribute directly; Rust asks us to mark a binding mutable before we change through it.</p>
+      <div class="callout"><strong>Why this structure?</strong> The app state is the shopkeeper's current ledger: loading status, input, message, and latest result stay together. <code>Option&lt;WeatherQueryResult&gt;</code> distinguishes “no result yet” from a real measurement such as <code>Some(0.0)</code>. It is safer than treating zero as a missing-value marker.</div>
+    </section>
+
+    <section class="tech-card card-pad">
       <h2>Watch and read</h2>
       <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=515s" target="_blank" rel="noopener noreferrer">Video: app state and constructor, around 8:35</a>.</p>
       <p>Read the <code>CyberWeatherApp</code> fields and <code>new</code> method together. Next: <a href="0004-validate-input.html" target="_blank" rel="noopener noreferrer">turn user text into a valid request</a>.</p>

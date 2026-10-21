@@ -70,6 +70,39 @@
     </section>
 
     <section class="tech-card card-pad">
+      <h2>Code along: choose a route from the location type</h2>
+      <p>Create <code>src/bin/lesson_06.rs</code> in Zed's file tree and paste this complete program. It uses only the standard library, so we can practice the route decision without adding an HTTP dependency yet.</p>
+      <pre><code>enum LocationQuery {
+    CityState { city: String, state: String },
+    Coordinates { latitude: f64, longitude: f64 },
+}
+
+fn describe_route(query: LocationQuery) -&gt; String {
+    match query {
+        LocationQuery::CityState { city, state } =&gt; {
+            format!("Geocode {city}, {state} before requesting weather")
+        }
+        LocationQuery::Coordinates {
+            latitude,
+            longitude,
+        } =&gt; {
+            format!("Request weather at ({latitude}, {longitude})")
+        }
+    }
+}
+
+fn main() {
+    let query = LocationQuery::Coordinates {
+        latitude: 6.52,
+        longitude: 3.38,
+    };
+
+    println!("{}", describe_route(query));
+}</code></pre>
+      <p>Run <code>cargo run --bin lesson_06</code>. It should print <code>Request weather at (6.52, 3.38)</code>. Change the value to the <code>CityState</code> variant, using <code>String::from("Lagos")</code> for both fields, then run it again. The enum forces us to choose one route, and <code>match</code> handles each route before any network call is made.</p>
+    </section>
+
+    <section class="tech-card card-pad">
       <h2>Watch and read</h2>
       <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=1961s" target="_blank" rel="noopener noreferrer">Video: service flow and weather request, around 32:41–34:37</a>.</p>
       <p>Primary references: <a href="https://open-meteo.com/en/docs/geocoding-api" target="_blank" rel="noopener noreferrer">Open-Meteo Geocoding API</a> and <a href="https://open-meteo.com/en/docs" target="_blank" rel="noopener noreferrer">Open-Meteo Forecast API</a>. Next: <a href="0007-normalize-api-data.html" target="_blank" rel="noopener noreferrer">turn returned JSON into app data</a>.</p>

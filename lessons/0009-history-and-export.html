@@ -66,6 +66,30 @@
     </section>
 
     <section class="tech-card card-pad">
+      <h2>Code along: save a small history file</h2>
+      <p>Create <code>src/bin/lesson_09.rs</code> and paste this complete program. It writes a plain text file in the project folder so we can focus on Rust file errors before we study JSON and CSV formats.</p>
+      <pre><code>use std::fs;
+use std::io;
+
+fn save_history(path: &amp;str, entries: &amp;[String]) -&gt; io::Result&lt;()&gt; {
+    fs::write(path, entries.join("\n"))
+}
+
+fn main() {
+    let entries = vec![
+        String::from("2026-10-21: Lagos, 31.5 C"),
+        String::from("2026-10-22: Lagos, 30.8 C"),
+    ];
+
+    match save_history("weather-history.txt", &amp;entries) {
+        Ok(()) =&gt; println!("Saved {} history entries", entries.len()),
+        Err(error) =&gt; eprintln!("Could not save history: {error}"),
+    }
+}</code></pre>
+      <p>Run <code>cargo run --bin lesson_09</code>, then look for <code>weather-history.txt</code> in the project root. <code>&amp;[String]</code> is a read-only borrowed view of the entries; <code>fs::write</code> returns a <code>Result</code>, so the program reports either success or the file error. A real CSV file needs correct escaping for commas and quotes, which is why the reference app uses a CSV crate for export.</p>
+    </section>
+
+    <section class="tech-card card-pad">
       <h2>Watch and read</h2>
       <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=2155s" target="_blank" rel="noopener noreferrer">Video: history service, around 35:55</a>.</p>
       <p>Primary references: <a href="https://serde.rs/derive.html" target="_blank" rel="noopener noreferrer">Serde derive</a> and the <a href="https://docs.rs/csv/latest/csv/" target="_blank" rel="noopener noreferrer">csv crate</a>. Then take on the <a href="0010-capstone.html" target="_blank" rel="noopener noreferrer">small feature capstone</a>.</p>

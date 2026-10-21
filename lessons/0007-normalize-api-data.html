@@ -71,6 +71,44 @@ precipitation = daily.get("precipitation_sum")</code></pre>
     </section>
 
     <section class="tech-card card-pad">
+      <h2>Code along: normalize outside data into our own record</h2>
+      <p>Create <code>src/bin/lesson_07.rs</code> and paste this complete program. We use a small mock response so the exercise runs without an API key, network request, or extra crate.</p>
+      <pre><code>#[derive(Debug)]
+struct ApiDay {
+    date: String,
+    maximum_c: Option&lt;f64&gt;,
+    precipitation_mm: Option&lt;f64&gt;,
+}
+
+#[derive(Debug)]
+struct WeatherDayRecord {
+    date: String,
+    high_c: Option&lt;f64&gt;,
+    rain_mm: Option&lt;f64&gt;,
+}
+
+fn normalize(day: ApiDay) -&gt; WeatherDayRecord {
+    WeatherDayRecord {
+        date: day.date,
+        high_c: day.maximum_c,
+        rain_mm: day.precipitation_mm,
+    }
+}
+
+fn main() {
+    let api_day = ApiDay {
+        date: String::from("2026-10-21"),
+        maximum_c: Some(31.5),
+        precipitation_mm: None,
+    };
+
+    let record = normalize(api_day);
+    println!("{record:#?}");
+}</code></pre>
+      <p>Run <code>cargo run --bin lesson_07</code>. The printed record keeps the temperature as <code>Some(31.5)</code> and the unavailable rainfall as <code>None</code>. The API-shaped type is the delivery at the market gate; <code>normalize</code> checks and reshapes it before the rest of the app relies on it. We are mocking already-decoded data here; the reference app uses Serde to decode real JSON.</p>
+    </section>
+
+    <section class="tech-card card-pad">
       <h2>Watch and read</h2>
       <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=2077s" target="_blank" rel="noopener noreferrer">Video: parsing the response and day records, around 34:37–35:55</a>.</p>
       <p>Primary references: <a href="https://serde.rs/derive.html" target="_blank" rel="noopener noreferrer">Serde derive</a> and the <a href="https://open-meteo.com/en/docs" target="_blank" rel="noopener noreferrer">Open-Meteo response fields</a>.</p>

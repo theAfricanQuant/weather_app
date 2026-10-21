@@ -99,6 +99,51 @@ thread::spawn(move || {
     </section>
 
     <section class="tech-card card-pad">
+      <h2>Code along: send a result back from a worker thread</h2>
+      <p>We will keep our first four files and add a separate runnable example. In Zed's file tree, right-click <code>src</code>, choose <strong>New Folder</strong>, and name it <code>bin</code>. Inside it, create <code>lesson_05.rs</code> and paste this complete program. Cargo automatically treats each Rust file in <code>src/bin</code> as its own executable, so we do not need to edit <code>Cargo.toml</code> or replace <code>src/main.rs</code>:</p>
+      <pre><code>use std::sync::mpsc;
+use std::thread;
+
+#[derive(Debug)]
+enum WorkerMessage {
+    Success(String),
+    Failure(String),
+}
+
+fn main() {
+    let (sender, receiver) = mpsc::channel();
+    let worker = thread::spawn(move || {
+        let raw = String::from("6.52");
+        let message = match raw.parse::&lt;f64&gt;() {
+            Ok(latitude) =&gt; {
+                WorkerMessage::Success(format!("Latitude {latitude} is valid"))
+            }
+            Err(_) =&gt; {
+                WorkerMessage::Failure(String::from("Latitude is not a number"))
+            }
+        };
+
+        sender
+            .send(message)
+            .expect("the receiver should still be open");
+    });
+
+    match receiver.recv() {
+        Ok(WorkerMessage::Success(message)) =&gt; {
+            println!("Worker succeeded: {message}");
+        }
+        Ok(WorkerMessage::Failure(message)) =&gt; {
+            println!("Worker failed: {message}");
+        }
+        Err(error) =&gt; eprintln!("Worker channel closed: {error}"),
+    }
+
+    worker.join().expect("the worker should not panic");
+}</code></pre>
+      <p>Save it, then run <code>cargo run --bin lesson_05</code>. You should see <code>Worker succeeded: Latitude 6.52 is valid</code>. The <code>move</code> closure takes ownership of <code>sender</code> and <code>raw</code> so they remain valid in the new thread. The message enum limits what the worker can send. This small terminal example waits for the result; a GUI must keep its window responsive and check for messages without blocking.</p>
+    </section>
+
+    <section class="tech-card card-pad">
       <h2>Watch and read</h2>
       <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=742s" target="_blank" rel="noopener noreferrer">Video: background worker pattern, around 12:22</a>.</p>
       <p>Primary references: <a href="https://doc.rust-lang.org/book/ch16-01-threads.html" target="_blank" rel="noopener noreferrer">Rust Book: threads</a>, <a href="https://doc.rust-lang.org/std/sync/mpsc/fn.channel.html" target="_blank" rel="noopener noreferrer">mpsc::channel</a>, and <a href="https://docs.rs/reqwest/latest/reqwest/blocking/" target="_blank" rel="noopener noreferrer">reqwest blocking</a>.</p>

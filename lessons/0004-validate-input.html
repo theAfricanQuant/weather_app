@@ -80,6 +80,101 @@ def parse_date_range(
     </section>
 
     <section class="tech-card card-pad">
+      <h2>Code along: validate coordinates before building a request</h2>
+      <p>Create <code>src/input.rs</code> from the <code>src</code> folder in Zed's file tree. Paste this code and save it with <code>Esc</code>, <code>:w</code>, <code>Enter</code>:</p>
+      <pre><code>fn parse_coordinate(
+    raw: &amp;str,
+    label: &amp;str,
+    min: f64,
+    max: f64,
+) -&gt; Result&lt;f64, String&gt; {
+    let value = raw
+        .trim()
+        .parse::&lt;f64&gt;()
+        .map_err(|_| format!("{label} must be a number"))?;
+
+    if !(min..=max).contains(&amp;value) {
+        return Err(format!("{label} must be between {min} and {max}"));
+    }
+
+    Ok(value)
+}
+
+pub fn parse_latitude(raw: &amp;str) -&gt; Result&lt;f64, String&gt; {
+    parse_coordinate(raw, "Latitude", -90.0, 90.0)
+}
+
+pub fn parse_longitude(raw: &amp;str) -&gt; Result&lt;f64, String&gt; {
+    parse_coordinate(raw, "Longitude", -180.0, 180.0)
+}</code></pre>
+      <p>Next, replace <code>src/app_state.rs</code> with this version. We add a request field so validated coordinates have somewhere to go:</p>
+      <pre><code>use crate::models::{WeatherQueryRequest, WeatherQueryResult};
+
+#[derive(Debug)]
+pub struct AppState {
+    pub input_location: String,
+    pub loading: bool,
+    pub request: Option&lt;WeatherQueryRequest&gt;,
+    pub latest_result: Option&lt;WeatherQueryResult&gt;,
+    pub status: String,
+}
+
+impl AppState {
+    pub fn new() -&gt; Self {
+        Self {
+            input_location: String::from("Lagos"),
+            loading: false,
+            request: None,
+            latest_result: None,
+            status: String::from("Ready"),
+        }
+    }
+}</code></pre>
+      <p>Finally, replace <code>src/main.rs</code> with this complete example:</p>
+      <pre><code>mod app_state;
+mod input;
+mod models;
+
+use app_state::AppState;
+use models::{LocationQuery, WeatherQueryRequest};
+
+fn main() {
+    for raw in ["6.52", "west", "120.0"] {
+        println!(
+            "Latitude {:?} -&gt; {:?}",
+            raw,
+            input::parse_latitude(raw),
+        );
+    }
+
+    let latitude = input::parse_latitude("6.52");
+    let longitude = input::parse_longitude("3.38");
+    let mut state = AppState::new();
+
+    match (latitude, longitude) {
+        (Ok(latitude), Ok(longitude)) =&gt; {
+            state.request = Some(WeatherQueryRequest {
+                location: LocationQuery::Coordinates {
+                    latitude,
+                    longitude,
+                },
+                start_date: String::from("2026-10-21"),
+                end_date: String::from("2026-10-22"),
+            });
+            state.status = String::from("Coordinates validated");
+        }
+        (Err(error), _) | (_, Err(error)) =&gt; {
+            state.status = error;
+        }
+    }
+
+    println!("Request state:\n{state:#?}");
+}</code></pre>
+      <p>Save the files and run <code>cargo run</code>. You should see <code>6.52</code> accepted, <code>west</code> rejected as non-numeric, and <code>120.0</code> rejected as an invalid latitude. Then the final state contains a coordinate-based request.</p>
+      <div class="callout"><strong>Rust and Python side by side:</strong> Python might parse with <code>float(raw)</code> and catch <code>ValueError</code>. Here the return type <code>Result&lt;f64, String&gt;</code> makes success or failure part of the function's contract. The <code>? </code> operator returns early if parsing fails; <code>map_err</code> turns the parser's technical error into a helpful message. We validate before putting coordinates into the request, like checking a danfo passenger's destination before issuing the ticket.</div>
+    </section>
+
+    <section class="tech-card card-pad">
       <h2>Watch and read</h2>
       <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=905s" target="_blank" rel="noopener noreferrer">Video: input validation and dates, around 15:05</a>.</p>
       <p>Primary references: <a href="https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html" target="_blank" rel="noopener noreferrer">Rust Book: Result</a> and <a href="https://docs.rs/chrono/latest/chrono/naive/struct.NaiveDate.html" target="_blank" rel="noopener noreferrer">Chrono NaiveDate</a>. Next: <a href="0005-background-worker.html" target="_blank" rel="noopener noreferrer">keep the GUI responsive during the request</a>.</p>
