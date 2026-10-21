@@ -118,6 +118,16 @@ fn main() {
 }</code></pre>
       <p>Save both files, then run <code>cargo run</code> in the project folder. The terminal should print the request and its nested <code>CityState</code> value. <code>mod models;</code> connects <code>src/models.rs</code> to the crate; <code>use</code> brings its names into this file. The <code>pub</code> keywords allow the parent module to use items declared inside <code>models</code>. The dates are strings for now; Lesson 4 will validate user text before we treat it as a request.</p>
       <div class="callout"><strong>Pythonista lens:</strong> <code>models.rs</code> is roughly like a Python module, but Rust does not include every file just because it exists. We declare the module with <code>mod models;</code>. The enum is like a carefully shaped set of alternatives: a location is either a city/state pair or coordinates. <code>String::from</code> creates owned Rust strings; Python manages string lifetimes for you, while Rust will make ownership rules explicit as we use values.</div>
+      <div class="callout">
+        <strong>Reading the warnings from your run:</strong>
+        <p>Your program compiled and ran: <code>Finished</code> and <code>Running</code> confirm that. The three <code>dead_code</code> warnings are Rust pointing out that we have described more of the model than this tiny program uses so far. That is expected in this staged lesson; these are warnings, not errors.</p>
+        <ul>
+          <li><code>city</code> and <code>state</code> are only shown by the automatically derived <code>Debug</code> printer. Rust deliberately does not count diagnostic printing as the program meaningfully reading those fields.</li>
+          <li><code>Coordinates</code> is a valid enum option, but this example constructs only <code>CityState</code>, so Rust notes that the other option has not been used yet.</li>
+          <li>The request's <code>location</code>, <code>start_date</code>, and <code>end_date</code> are also only printed for inspection. We have not yet used them to validate input or make a weather request.</li>
+        </ul>
+        <p>In Python, a linter such as Ruff or an editor checker might flag unused code separately. Rust includes this useful check in the compiler. Leave these warnings alone for now; later lessons will use the fields and choices. The printed Lagos request is a sample data structure, not a live weather lookup.</p>
+      </div>
     </section>
 
     <section class="tech-card card-pad">
