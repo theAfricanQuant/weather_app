@@ -34,6 +34,7 @@
     <section class="tech-card card-pad">
       <h2>Map the project</h2>
       <p><code>Cargo.toml</code> is Cargo's inventory: package name, Rust edition, and dependencies. Our first <code>src/main.rs</code> is a tiny executable so we can prove the crate builds before adding weather features. The upstream <code>main.rs</code> uses module declarations to bring the app's rooms into its crate, then eframe opens the native window. We will compare that complete app with our own growing version.</p>
+      <div class="callout"><strong>Do not paste this Rust block into your starter yet.</strong> It is an excerpt from the larger reference app, shown so we can recognize what its entry point does. Our starter crate does not yet have the <code>eframe</code> dependency or the <code>app</code> module this code uses, so it will not compile here. For this lesson, read the excerpt; in the “Try it in your workspace” section, type only the shell commands into the terminal and leave <code>src/main.rs</code> as Cargo created it.</div>
       <pre><code>let options = eframe::NativeOptions {
     viewport: eframe::egui::ViewportBuilder::default()
         .with_inner_size([1240.0, 840.0])
@@ -49,6 +50,16 @@ eframe::run_native(
 )</code></pre>
       <p>This is a trimmed excerpt from the reference app's <code>main.rs</code>. Its job is the front gate: set window options, then pass construction to <code>CyberWeatherApp::new</code>. Think of it like the entrance to a market; it directs you to the right stall without stocking every item itself. Our starter crate will initially print a line in the terminal; we will add the GUI only after the crate structure and Rust basics are clear.</p>
       <div class="callout"><strong>Pythonista lens — entry points and packages:</strong> <code>main.rs</code> is the Rust binary's entry point, a little like the file Python runs as a script. Rust does not use Python's <code>if __name__ == "__main__":</code> convention here; the <code>main</code> function is the declared start. <code>Cargo.toml</code> is the package manifest, somewhat like project metadata in <code>pyproject.toml</code>. The key difference today: <code>cargo run</code> compiles the project before launching it, so type and syntax problems can stop us before the window opens.</div>
+      <details class="python-example">
+        <summary>Pythonista comparison: the entry point</summary>
+        <p>A common Python script puts its work in <code>main()</code> and uses a guard so that function runs only when the file is launched directly. Rust starts at <code>fn main()</code> without this guard.</p>
+        <pre><code class="language-python">def main() -&gt; None:
+    print("Hello, world!")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+      </details>
       <p><a href="https://github.com/feenix100/rusty_weather/blob/main/src/main.rs">Open the complete main.rs</a> · <a href="https://github.com/feenix100/rusty_weather/blob/main/Cargo.toml">Open Cargo.toml</a></p>
     </section>
 

@@ -45,6 +45,18 @@
 }</code></pre>
       <p>This is a sketch of the real struct. Its constructor sets a ready status, a default city and dates, no result yet, and any saved history it can load. State is like the shopkeeper's ledger: it records the current situation, while later UI code reads it to decide what to show.</p>
       <div class="callout"><strong>Pythonista lens — a struct is a fixed data shape:</strong> You can picture <code>CyberWeatherApp</code> as a typed dataclass whose fields have declared types. Unlike a Python instance that can freely gain or change attributes at runtime, this struct has a known set of fields and each field keeps its declared type. Rust also does not call a special <code>__init__</code> automatically: this project writes a <code>new</code> method to build a complete app value. Notice <code>Option&lt;WeatherQueryResult&gt;</code>: the app starts with <code>None</code>, then holds <code>Some(result)</code> after success. That explicit absence keeps “not loaded yet” distinct from a real result.</div>
+      <details class="python-example">
+        <summary>Pythonista comparison: app state as a dataclass</summary>
+        <p><code>WeatherQueryResult</code> stands for the result type defined elsewhere in the app. The <code>| None</code> annotation uses Python 3.10+ syntax and helps readers and type-checking tools; Rust's <code>Option&lt;WeatherQueryResult&gt;</code> also makes callers handle absence in the program.</p>
+        <pre><code class="language-python">from dataclasses import dataclass
+
+
+@dataclass
+class AppState:
+    loading: bool = False
+    status_text: str = "Ready"
+    latest_result: WeatherQueryResult | None = None</code></pre>
+      </details>
       <div class="trace" aria-label="Startup state trace">
         <div class="trace-step"><strong>Input</strong>Default city and dates</div>
         <div class="trace-step"><strong>Result</strong><code>None</code></div>

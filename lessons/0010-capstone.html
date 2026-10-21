@@ -40,6 +40,16 @@
 },</code></pre>
       <p>Add that entry to <code>QUICK_CITIES</code> and change its declared array length from 6 to 7. Keep the six existing entries in place; the array's declared length must match its number of entries. The geocoder searches US city/state results, so this location fits the app's current limitation.</p>
       <div class="callout"><strong>Pythonista lens — the array length is part of its type:</strong> A Python list can grow when you append an item. A Rust array has a fixed length recorded in its type, so <code>[QuickCity; 6]</code> and <code>[QuickCity; 7]</code> are different types. We update both the declared length and the entries so the compiler can confirm they agree. This is a small example of Rust asking us to state a constraint once, then checking it for us. If the length does not match, the compiler points to the mismatch before the app runs.</div>
+      <details class="python-example">
+        <summary>Pythonista comparison: grow a list</summary>
+        <p>Assume <code>QuickCity</code> is defined elsewhere in the Python app. On Python 3.9+, this type hint describes a list whose items are <code>QuickCity</code> values. A Python list can grow when an item is appended; Rust's fixed-size array records its length in its type.</p>
+        <pre><code class="language-python">quick_cities: list[QuickCity] = [
+    QuickCity(city="Boston", state="MA"),
+]
+quick_cities.append(
+    QuickCity(city="Chicago", state="IL"),
+)</code></pre>
+      </details>
     </section>
 
     <section class="tech-card card-pad">

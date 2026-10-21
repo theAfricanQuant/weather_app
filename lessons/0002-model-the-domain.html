@@ -47,6 +47,26 @@ struct WeatherQueryRequest {
       <p>Think of <code>LocationQuery</code> like a danfo ticket with one destination format: it carries either a named route or GPS coordinates. The type prevents the “both at once” arrangement before the API call starts.</p>
       <p>Weather fields that may be missing use <code>Option&lt;T&gt;</code>. For example, a current temperature can be <code>Some(value)</code> or <code>None</code>; “missing” is represented explicitly rather than by a magic number.</p>
       <div class="callout"><strong>Pythonista lens — make invalid shapes harder to express:</strong> Python might pass a dictionary with keys such as <code>city</code>, <code>latitude</code>, and <code>longitude</code>, then check at runtime which combination is present. Here, <code>LocationQuery</code> is an enum: it must be one named variant, and each variant carries only the fields that belong to it. The compiler can reject code that tries to construct an impossible mixture. A Rust <code>Option&lt;f64&gt;</code> resembles a number-or-<code>None</code> in Python, but Rust makes callers handle both <code>Some(number)</code> and <code>None</code> explicitly.</div>
+      <details class="python-example">
+        <summary>Pythonista comparison: two location shapes</summary>
+        <p>Python 3.10+ can describe the alternatives with a union of dataclasses. These annotations help tools and readers, but Python does not enforce them at runtime the way Rust checks enum construction at compile time.</p>
+        <pre><code class="language-python">from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class CityState:
+    city: str
+    state: str
+
+
+@dataclass(frozen=True)
+class Coordinates:
+    latitude: float
+    longitude: float
+
+
+LocationQuery = CityState | Coordinates</code></pre>
+      </details>
       <p><a href="https://github.com/feenix100/rusty_weather/blob/main/src/models.rs">Open models.rs</a> · <a href="https://doc.rust-lang.org/book/ch06-01-defining-an-enum.html">Rust Book: enums</a></p>
     </section>
 

@@ -43,6 +43,15 @@
       <p>The geocoder is like a motor-park dispatcher who turns a place name into a destination pin. One important boundary: this repository's geocoder sends <code>countryCode=US</code> and searches for a US state. That city/state route is US-only in the current code. Coordinate mode is available for other regions.</p>
       <p>Then <code>fetch_weather_range</code> chooses the forecast endpoint for today/future dates and the archive endpoint for dates in the past. A range crossing today is split into two calls and merged by date.</p>
       <div class="callout"><strong>Pythonista lens — turn choices into typed routes:</strong> A Python implementation might pass a string like <code>"city"</code> or a dictionary and branch on it later. Here, matching on <code>LocationQuery</code> makes the two routes explicit: city/state first needs geocoding, while coordinates already identify a point. The function signatures also show what comes back and what can fail. This is useful when an HTTP request has several stages: resolve a place, choose the correct forecast or archive endpoint, then convert the response. The enum acts like a danfo ticket for one valid route at a time.</div>
+      <details class="python-example">
+        <summary>Pythonista comparison: route by the input shape</summary>
+        <p>This uses Python 3.10 structural pattern matching with the dataclasses from the previous example. Rust's <code>match</code> also selects a route, and the compiler can check that every enum variant is covered.</p>
+        <pre><code class="language-python">match query:
+    case CityState(city=city, state=state):
+        coordinates = geocode(city, state)
+    case Coordinates(latitude=latitude, longitude=longitude):
+        coordinates = (latitude, longitude)</code></pre>
+      </details>
       <p><a href="https://github.com/feenix100/rusty_weather/blob/main/src/geocoding_service.rs">Open geocoding_service.rs</a> · <a href="https://github.com/feenix100/rusty_weather/blob/main/src/weather_service.rs">Open weather_service.rs</a></p>
     </section>
 

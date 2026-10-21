@@ -45,6 +45,14 @@ struct OpenMeteoDaily {
       <p>The <code>time</code> list establishes how many day records exist. Optional measurement arrays are expanded to that length. If an array is absent or has a mismatched length, its slots become <code>None</code>. Each record then carries a date, optional measurements, a readable description, and a source label.</p>
       <p>Like a produce stall sorting a mixed delivery into labeled baskets, the service turns outside data into the app's own steady shape before the GUI handles it.</p>
       <div class="callout"><strong>Pythonista lens — parse into known fields, then handle absence:</strong> In Python it is common to keep decoded JSON as nested dictionaries and discover a missing key when indexing it. Serde deserializes the response into Rust structs with named fields and declared types. Optional API fields become <code>Option&lt;T&gt;</code>, so a missing measurement is not silently confused with zero. The service normalizes uneven arrays before the rest of the app sees them; the GUI can then rely on one predictable record shape. This boundary is like checking a delivery at the market gate before sending it to each stall.</div>
+      <details class="python-example">
+        <summary>Pythonista comparison: read optional fields from JSON</summary>
+        <p>Python's <code>dict.get()</code> is a familiar way to handle a missing key. In Rust, deserializing into typed structs and using <code>Option&lt;T&gt;</code> makes those missing values explicit after parsing.</p>
+        <pre><code class="language-python">payload = response.json()
+daily = payload.get("daily", {})
+dates = daily.get("time", [])
+precipitation = daily.get("precipitation_sum")</code></pre>
+      </details>
       <p><a href="https://github.com/feenix100/rusty_weather/blob/main/src/weather_service.rs">Open API structs and build_day_records</a> · <a href="https://github.com/feenix100/rusty_weather/blob/main/src/models.rs">Open the internal WeatherDayRecord type</a></p>
     </section>
 

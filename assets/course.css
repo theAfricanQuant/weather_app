@@ -158,3 +158,16 @@ button { font: inherit; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; }
 }
+
+
+/* Optional Python comparisons stay within the lesson margins. */
+.python-example {
+  margin: .8rem 0;
+  padding: .75rem 1rem;
+  border: 1px solid #b9c8c0;
+  border-radius: .8rem;
+  background: #f4f8f4;
+}
+.python-example summary { cursor: pointer; font-weight: 750; }
+.python-example p { margin: .5rem 0; }
+.python-example pre { margin-top: .65rem; }

@@ -44,6 +44,24 @@
 }</code></pre>
       <p>This omits the empty-field checks to keep the pattern visible. The <code>?</code> operator returns early if parsing fails. The final <code>Ok</code> is reached only after both dates pass the order check.</p>
       <div class="callout"><strong>Pythonista lens — recoverable errors are values:</strong> You may be used to wrapping parsing in <code>try/except</code>. This function instead returns <code>Result&lt;T, E&gt;</code>: either <code>Ok(request)</code> or <code>Err(message)</code>. The <code>?</code> operator means “if this step failed, return that error from this function now; otherwise give me the successful value.” It works because the function itself promises a <code>Result</code>. That makes the error path visible in the function's type, and the UI can turn it into a status message instead of letting bad text reach the network layer.</div>
+      <details class="python-example">
+        <summary>Pythonista comparison: parse and validate dates</summary>
+        <p>Python commonly signals invalid input by raising an exception, which the caller catches. The built-in <code>tuple[...]</code> type hint shown here requires Python 3.9+. Rust returns a <code>Result</code> value instead, so the success and error paths appear in the function's type.</p>
+        <pre><code class="language-python">from datetime import date
+
+
+def parse_date_range(
+    start_text: str,
+    end_text: str,
+) -&gt; tuple[date, date]:
+    start = date.fromisoformat(start_text)
+    end = date.fromisoformat(end_text)
+
+    if start &gt; end:
+        raise ValueError("Start date must be on or before end date")
+
+    return start, end</code></pre>
+      </details>
       <p><a href="https://github.com/feenix100/rusty_weather/blob/main/src/app.rs">Find parse_date_range and build_request in app.rs</a> · <a href="https://github.com/feenix100/rusty_weather/blob/main/src/date_utils.rs">Read date_utils.rs</a></p>
     </section>
 

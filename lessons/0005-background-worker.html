@@ -42,6 +42,34 @@
       </div>
       <p>Think of it like sending a runner from the market stall to the depot: the stall keeps serving people while the runner returns with a receipt. This app does not use async/await for HTTP; it uses blocking reqwest inside the separate worker thread.</p>
       <div class="callout"><strong>Pythonista lens — a thread has to receive what it uses:</strong> A Python thread can often close over names from its surrounding function, with Python's runtime managing the referenced objects. Rust makes the handoff explicit. The <code>move</code> closure takes ownership of the request and sender so the new thread has values that remain valid while it works. Rust also checks that values crossing the thread boundary satisfy its thread-safety rules. The channel is like a typed dispatch pouch: the worker can send only the message shape declared by <code>WorkerMessage</code>, and the UI checks for a message without waiting.</div>
+      <details class="python-example">
+        <summary>Pythonista comparison: send worker results through a queue</summary>
+        <p>Assume <code>WeatherResult</code>, <code>WeatherRequestError</code>, and <code>WeatherQueryRequest</code> are types defined elsewhere in the Python app. This Python 3.10+ sketch uses a queue to carry either a result or a specific, app-defined error from a worker thread. Rust's <code>WorkerMessage</code> enum gives those alternatives a named, compiler-checked shape; Python's annotation alone does not enforce the queue contents.</p>
+        <pre><code class="language-python">from queue import Queue
+from threading import Thread
+
+
+messages: Queue[WeatherResult | WeatherRequestError] = Queue()
+
+
+def fetch_in_background(
+    request: WeatherQueryRequest,
+    messages: Queue[WeatherResult | WeatherRequestError],
+) -&gt; None:
+    try:
+        result = fetch_weather(request)
+    except WeatherRequestError as error:
+        messages.put(error)
+    else:
+        messages.put(result)
+
+
+Thread(
+    target=fetch_in_background,
+    args=(request, messages),
+    daemon=True,
+).start()</code></pre>
+      </details>
       <pre><code>let (tx, rx) = mpsc::channel();
 self.worker_rx = Some(rx);
 self.loading = true;

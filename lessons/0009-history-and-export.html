@@ -36,6 +36,12 @@
       <p>After success, <code>poll_worker</code> converts the result into a <code>HistoryEntry</code>, appends it to the app's history vector, and asks <code>history_service</code> to save the collection. The model type derives Serde traits so the structured data can be written to JSON and read on startup.</p>
       <p>The “Export CSV” button follows a separate path. The service flattens multi-day results so each day becomes a row, then writes a timestamped CSV file. Think of JSON as the shop's ledger that can be reopened; CSV is the market receipt you take away for a spreadsheet.</p>
       <div class="callout"><strong>Pythonista lens — persistence has its own failure path:</strong> Python code might call <code>json.dump</code> and handle file exceptions around it. Here, the history service returns a result that the app must inspect. Fetching weather successfully does not guarantee that writing to disk succeeded, so the UI reports the two outcomes separately. The Rust structs describe the saved data shape, and Serde handles conversion between those typed values and JSON. CSV is a separate export shape for spreadsheet users, not the app's internal history format.</div>
+      <details class="python-example">
+        <summary>Pythonista comparison: save JSON with a context manager</summary>
+        <p>Python's <code>with</code> statement closes the file even if writing raises an exception. This assumes <code>history_entries</code> already contains JSON-serializable values. The Rust service returns a <code>Result</code> so the app can report whether saving succeeded.</p>
+        <pre><code class="language-python">with history_path.open("w", encoding="utf-8") as history_file:
+    json.dump(history_entries, history_file, indent=2)</code></pre>
+      </details>
       <div class="trace" aria-label="History flow">
         <div class="trace-step"><strong>Success</strong>WeatherQueryResult</div>
         <div class="trace-step"><strong>Snapshot</strong>HistoryEntry</div>
