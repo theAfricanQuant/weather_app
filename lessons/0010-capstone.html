@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>10 · Add one more city</title>
+  <link rel="stylesheet" href="../assets/tech-course-theme.css">
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body class="tech-course" data-lesson-id="lesson-10">
+  <header class="tech-course__header course-top">
+    <div class="page-width">
+      <p class="eyebrow">Lesson 10 of 10 · about 20 minutes</p>
+      <h1>Add one more city</h1>
+      <p>Today's win: make a small change in the real project, then explain how it reaches the GUI.</p>
+      <p class="small-note"><a href="../index.html#guided-study">How we study as a Pythonista</a> · <a href="../index.html#zed-vim">Zed Vim keys</a></p>
+    </div>
+  </header>
+  <main class="page-width page-main lesson-body">
+    <section class="tech-card card-pad">
+      <h2>Before the explanation</h2>
+      <p>You want one more quick-select location. Where should its city and state data go?</p>
+      <div data-quiz data-feedback-correct="Correct. QUICK_CITIES is the shared data list that draw_quick_city_buttons iterates over." data-feedback-wrong="The button list is data in models.rs; app.rs already loops over that shared constant.">
+        <div class="quiz-options">
+          <button class="quiz-option" data-quiz-option data-correct="true">Add city data in models.rs</button>
+          <button class="quiz-option" data-quiz-option>Add query logic in app.rs</button>
+          <button class="quiz-option" data-quiz-option>Add display art in animation.rs</button>
+        </div>
+        <button class="action-button tech-action" data-check-quiz>Check my answer</button>
+        <p class="quiz-feedback" data-quiz-feedback role="status" hidden></p>
+      </div>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>The change</h2>
+      <p>Add Boston, Massachusetts as a seventh quick city. It is deliberately small: the data list changes, while the existing loop supplies the button and copies the selection into the input fields. This capstone practices finding the right module instead of rewriting working UI code.</p>
+      <pre><code>QuickCity {
+    city: "Boston",
+    state: "MA",
+},</code></pre>
+      <p>Add that entry to <code>QUICK_CITIES</code> and change its declared array length from 6 to 7. Keep the six existing entries in place; the array's declared length must match its number of entries. The geocoder searches US city/state results, so this location fits the app's current limitation.</p>
+      <div class="callout"><strong>Pythonista lens — the array length is part of its type:</strong> A Python list can grow when you append an item. A Rust array has a fixed length recorded in its type, so <code>[QuickCity; 6]</code> and <code>[QuickCity; 7]</code> are different types. We update both the declared length and the entries so the compiler can confirm they agree. This is a small example of Rust asking us to state a constraint once, then checking it for us. If the length does not match, the compiler points to the mismatch before the app runs.</div>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Your build sequence</h2>
+      <ol>
+        <li>Open <code>source/src/models.rs</code> and find <code>QUICK_CITIES</code>.</li>
+        <li>Change the array length from 6 to 7 and add the Boston entry after the existing cities.</li>
+        <li>Run <code>cargo check</code> from <code>source/</code>. Fix any type or syntax error before launching.</li>
+        <li>Run <code>cargo run</code>. Confirm the new button appears and selects Boston, MA.</li>
+        <li>Use “Get Weather” if you have network access. The request should go through the existing city geocoder and worker flow.</li>
+      </ol>
+      <div class="callout"><strong>Success criteria:</strong> it compiles, the preset button appears, selecting it fills the two text fields, and you can explain why no new drawing method was needed.</div>
+      <details class="answer-note">
+        <summary>Hints after your attempt</summary>
+        <p><code>draw_quick_city_buttons</code> iterates over <code>QUICK_CITIES</code>, creates each button, sets <code>InputMode::CityState</code>, and copies the selected city and state into app state. The existing draw method handles the new item automatically.</p>
+      </details>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Close the loop</h2>
+      <p>Without looking at the course map, trace the new click through the app: constant → button loop → input state → request validation → worker → geocoder → weather result. Tell me where you would look first if the button appeared but the request failed.</p>
+      <p>Open <a href="https://github.com/feenix100/rusty_weather/blob/main/src/models.rs">models.rs</a> and <a href="https://github.com/feenix100/rusty_weather/blob/main/src/app.rs">app.rs</a>. Keep this as your first reference for adding another preset or extending the app.</p>
+      <p class="small-note">When you share your attempt or explain the flow, I can record the concepts you have demonstrated and shape the next lesson around them.</p>
+    </section>
+
+    <div class="lesson-footer">
+      <button class="action-button" data-complete aria-pressed="false">Mark lesson complete</button>
+      <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a class="button-link" href="0009-history-and-export.html">Previous: history and export</a>
+        <a class="button-link" href="../index.html">Course home</a>
+      </nav>
+    </div>
+  </main>
+  <footer class="page-width course-foot">Progress is saved locally in this browser when you choose “Mark lesson complete.” Your code change stays in the source clone.</footer>
+  <script src="../assets/course.js"></script>
+</body>
+</html>

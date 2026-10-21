@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rusty Weather · Rust Patterns</title>
+  <link rel="stylesheet" href="../assets/tech-course-theme.css">
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body class="tech-course">
+  <header class="tech-course__header course-top">
+    <div class="page-width">
+      <p class="eyebrow">Print reference</p>
+      <h1>Rust patterns in this app</h1>
+      <p>A compact reminder. Use the linked lesson for the full explanation and practice.</p>
+    </div>
+  </header>
+  <main class="page-width page-main lesson-body">
+    <section class="tech-card card-pad">
+      <h2>Choose the type that says what is possible</h2>
+      <ul>
+        <li><strong>Struct:</strong> several named fields belong together, such as a weather request's location and dates.</li>
+        <li><strong>Enum:</strong> a value is one of several variants, such as <code>LocationQuery::CityState</code> or <code>LocationQuery::Coordinates</code>.</li>
+        <li><strong>Option&lt;T&gt;:</strong> a value may be present as <code>Some(value)</code> or absent as <code>None</code>.</li>
+        <li><strong>Result&lt;T, E&gt;:</strong> an operation may succeed with <code>Ok(value)</code> or fail with <code>Err(error)</code>.</li>
+      </ul>
+    </section>
+    <section class="tech-card card-pad">
+      <h2>Follow the control flow</h2>
+      <ul>
+        <li><strong><code>match</code>:</strong> choose behavior by enum variant and handle each case explicitly.</li>
+        <li><strong><code>?</code>:</strong> in a function returning a compatible Result, return early when an operation fails.</li>
+        <li><strong><code>move</code> closure:</strong> transfer ownership of captured values to the worker thread.</li>
+        <li><strong><code>mpsc</code> channel:</strong> pass a typed message from the worker back to the UI.</li>
+      </ul>
+    </section>
+    <section class="tech-card card-pad">
+      <h2>Keep API data at the edge</h2>
+      <p>Serde deserializes JSON into private response structs. The weather service validates and normalizes those fields into the app's own types. If a measurement is missing, keep it as <code>None</code>; do not invent a zero.</p>
+      <p><a href="../lessons/0002-model-the-domain.html">Lesson 02: data shapes</a> · <a href="../lessons/0004-validate-input.html">Lesson 04: Result</a> · <a href="../lessons/0005-background-worker.html">Lesson 05: thread and channel</a> · <a href="../lessons/0007-normalize-api-data.html">Lesson 07: API boundary</a></p>
+    </section>
+    <p class="small-note">The glossary will grow only after the learner shows they can use a term correctly.</p>
+  </main>
+</body>
+</html>

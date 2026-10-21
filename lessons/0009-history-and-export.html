@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>09 · Save the work and carry it out</title>
+  <link rel="stylesheet" href="../assets/tech-course-theme.css">
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body class="tech-course" data-lesson-id="lesson-09">
+  <header class="tech-course__header course-top">
+    <div class="page-width">
+      <p class="eyebrow">Lesson 09 of 10 · about 10 minutes</p>
+      <h1>Save the work and carry it out</h1>
+      <p>Today's win: trace the successful result into a local history file and a shareable CSV.</p>
+      <p class="small-note"><a href="../index.html#guided-study">How we study as a Pythonista</a> · <a href="../index.html#zed-vim">Zed Vim keys</a></p>
+    </div>
+  </header>
+  <main class="page-width page-main lesson-body">
+    <section class="tech-card card-pad">
+      <h2>Before the explanation</h2>
+      <p>Which format does the app use for its local saved search history?</p>
+      <div data-quiz data-feedback-correct="Right. JSON is the persisted history format; CSV is a separate export action." data-feedback-wrong="Follow history_service: distinguish the saved history file from the export button's output.">
+        <div class="quiz-options">
+          <button class="quiz-option" data-quiz-option data-correct="true">JSON file stores history locally</button>
+          <button class="quiz-option" data-quiz-option>CSV file stores history locally</button>
+          <button class="quiz-option" data-quiz-option>Weather API stores history locally</button>
+        </div>
+        <button class="action-button tech-action" data-check-quiz>Check my answer</button>
+        <p class="quiz-feedback" data-quiz-feedback role="status" hidden></p>
+      </div>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>A result becomes a snapshot</h2>
+      <p>After success, <code>poll_worker</code> converts the result into a <code>HistoryEntry</code>, appends it to the app's history vector, and asks <code>history_service</code> to save the collection. The model type derives Serde traits so the structured data can be written to JSON and read on startup.</p>
+      <p>The “Export CSV” button follows a separate path. The service flattens multi-day results so each day becomes a row, then writes a timestamped CSV file. Think of JSON as the shop's ledger that can be reopened; CSV is the market receipt you take away for a spreadsheet.</p>
+      <div class="callout"><strong>Pythonista lens — persistence has its own failure path:</strong> Python code might call <code>json.dump</code> and handle file exceptions around it. Here, the history service returns a result that the app must inspect. Fetching weather successfully does not guarantee that writing to disk succeeded, so the UI reports the two outcomes separately. The Rust structs describe the saved data shape, and Serde handles conversion between those typed values and JSON. CSV is a separate export shape for spreadsheet users, not the app's internal history format.</div>
+      <div class="trace" aria-label="History flow">
+        <div class="trace-step"><strong>Success</strong>WeatherQueryResult</div>
+        <div class="trace-step"><strong>Snapshot</strong>HistoryEntry</div>
+        <div class="trace-step"><strong>Persist</strong>JSON history file</div>
+        <div class="trace-step"><strong>Export</strong>One CSV row per day</div>
+      </div>
+      <p><a href="https://github.com/feenix100/rusty_weather/blob/main/src/history_service.rs">Open history_service.rs</a> · <a href="https://github.com/feenix100/rusty_weather/blob/main/src/models.rs">Open HistoryEntry in models.rs</a></p>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Practice: follow save and export separately</h2>
+      <ol>
+        <li>Search <code>history_service.rs</code> for the history filename and the JSON functions.</li>
+        <li>Find <code>export_history_csv</code>. What does it do when one search contains several days?</li>
+        <li>Find the “Clear Log” button. Does it clear only the screen or also the saved file?</li>
+        <li>Explain why the app reports a save error even if weather data was fetched successfully.</li>
+      </ol>
+      <details class="answer-note">
+        <summary>Check after your attempt</summary>
+        <p>History is stored in a local JSON file. CSV export makes one row per day. Clearing history updates the local file and the in-memory vector. The fetch can succeed while persistence fails, so the status explicitly reports both facts.</p>
+      </details>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Watch and read</h2>
+      <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=2155s">Video: history service, around 35:55</a>.</p>
+      <p>Primary references: <a href="https://serde.rs/derive.html">Serde derive</a> and the <a href="https://docs.rs/csv/latest/csv/">csv crate</a>. Then take on the <a href="0010-capstone.html">small feature capstone</a>.</p>
+      <p class="small-note">Ask me about JSON, CSV, or a particular failure path in the history service.</p>
+    </section>
+
+    <div class="lesson-footer">
+      <button class="action-button" data-complete aria-pressed="false">Mark lesson complete</button>
+      <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a class="button-link" href="0008-render-the-state.html">Previous: render state</a>
+        <a class="button-link" href="0010-capstone.html">Next: capstone</a>
+      </nav>
+    </div>
+  </main>
+  <footer class="page-width course-foot">Progress is saved locally in this browser when you choose “Mark lesson complete.”</footer>
+  <script src="../assets/course.js"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>02 · Give the data a shape</title>
+  <link rel="stylesheet" href="../assets/tech-course-theme.css">
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body class="tech-course" data-lesson-id="lesson-02">
+  <header class="tech-course__header course-top">
+    <div class="page-width">
+      <p class="eyebrow">Lesson 02 of 10 · about 12 minutes</p>
+      <h1>Give the data a shape</h1>
+      <p>Today's win: read a request type and tell which combinations Rust allows.</p>
+      <p class="small-note"><a href="../index.html#guided-study">How we study as a Pythonista</a> · <a href="../index.html#zed-vim">Zed Vim keys</a></p>
+    </div>
+  </header>
+  <main class="page-width page-main lesson-body">
+    <section class="tech-card card-pad">
+      <h2>Before the explanation</h2>
+      <p><code>LocationQuery</code> has a city/state variant and a latitude/longitude variant. Which input shape can it not represent?</p>
+      <div data-quiz data-feedback-correct="Right. One enum value is one variant, so a single location query cannot be both shapes at once." data-feedback-wrong="Look at the enum: each value chooses exactly one named variant, and each variant carries its own fields.">
+        <div class="quiz-options">
+          <button class="quiz-option" data-quiz-option data-correct="true">City and coordinates together</button>
+          <button class="quiz-option" data-quiz-option>City or coordinates alone</button>
+          <button class="quiz-option" data-quiz-option>Neither input is allowed</button>
+        </div>
+        <button class="action-button tech-action" data-check-quiz>Check my answer</button>
+        <p class="quiz-feedback" data-quiz-feedback role="status" hidden></p>
+      </div>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>One ticket, one route</h2>
+      <p>The app uses a Rust enum whose variants carry different data. This encodes a rule in the type: a query is either a city/state pair or a coordinate pair. In <code>models.rs</code>, a separate struct then bundles that location with a start and end date.</p>
+      <pre><code>enum LocationQuery {
+    CityState { city: String, state: String },
+    Coordinates { latitude: f64, longitude: f64 },
+}
+
+struct WeatherQueryRequest {
+    location: LocationQuery,
+    start_date: chrono::NaiveDate,
+    end_date: chrono::NaiveDate,
+}</code></pre>
+      <p>Think of <code>LocationQuery</code> like a danfo ticket with one destination format: it carries either a named route or GPS coordinates. The type prevents the “both at once” arrangement before the API call starts.</p>
+      <p>Weather fields that may be missing use <code>Option&lt;T&gt;</code>. For example, a current temperature can be <code>Some(value)</code> or <code>None</code>; “missing” is represented explicitly rather than by a magic number.</p>
+      <div class="callout"><strong>Pythonista lens — make invalid shapes harder to express:</strong> Python might pass a dictionary with keys such as <code>city</code>, <code>latitude</code>, and <code>longitude</code>, then check at runtime which combination is present. Here, <code>LocationQuery</code> is an enum: it must be one named variant, and each variant carries only the fields that belong to it. The compiler can reject code that tries to construct an impossible mixture. A Rust <code>Option&lt;f64&gt;</code> resembles a number-or-<code>None</code> in Python, but Rust makes callers handle both <code>Some(number)</code> and <code>None</code> explicitly.</div>
+      <p><a href="https://github.com/feenix100/rusty_weather/blob/main/src/models.rs">Open models.rs</a> · <a href="https://doc.rust-lang.org/book/ch06-01-defining-an-enum.html">Rust Book: enums</a></p>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Practice: trace one request</h2>
+      <ol>
+        <li>In <code>models.rs</code>, find <code>LocationQuery</code>, <code>WeatherQueryRequest</code>, and <code>WeatherQueryResult</code>.</li>
+        <li>On paper, draw a box for the request and list the exact values it needs.</li>
+        <li>Choose “Coordinates” in the running app. Which two strings must become numbers before a request can be built?</li>
+        <li>Find three <code>Option</code> fields in <code>WeatherQueryResult</code>. Write one sentence for why each might be absent.</li>
+      </ol>
+      <details class="answer-note">
+        <summary>Check after your attempt</summary>
+        <p>Coordinates are parsed into two <code>f64</code> values. <code>WeatherQueryResult</code> has optional fields such as city, current temperature, and weather code; a coordinate lookup has no city name, and an API can omit a weather measurement.</p>
+      </details>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Watch and read</h2>
+      <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=257s">Video: the model types, around 4:17</a>. Use the source file as the exact reference if the spoken chapter label and timestamp do not line up perfectly.</p>
+      <p>Primary reference: <a href="https://doc.rust-lang.org/book/ch06-01-defining-an-enum.html">Rust Book: defining an enum</a>. Next, <a href="0003-app-state.html">we put these types into app state</a>.</p>
+      <p class="small-note">Ask me about any type, variant, or missing value that still feels unclear.</p>
+    </section>
+
+    <div class="lesson-footer">
+      <button class="action-button" data-complete aria-pressed="false">Mark lesson complete</button>
+      <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a class="button-link" href="0001-orient-and-run.html">Previous: project map</a>
+        <a class="button-link" href="0003-app-state.html">Next: app state</a>
+      </nav>
+    </div>
+  </main>
+  <footer class="page-width course-foot">Progress is saved locally in this browser when you choose “Mark lesson complete.”</footer>
+  <script src="../assets/course.js"></script>
+</body>
+</html>

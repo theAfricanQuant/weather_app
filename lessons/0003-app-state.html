@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>03 · Keep the app's state in one place</title>
+  <link rel="stylesheet" href="../assets/tech-course-theme.css">
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body class="tech-course" data-lesson-id="lesson-03">
+  <header class="tech-course__header course-top">
+    <div class="page-width">
+      <p class="eyebrow">Lesson 03 of 10 · about 10 minutes</p>
+      <h1>Keep the app's state in one place</h1>
+      <p>Today's win: describe what the app knows before the first weather lookup.</p>
+      <p class="small-note"><a href="../index.html#guided-study">How we study as a Pythonista</a> · <a href="../index.html#zed-vim">Zed Vim keys</a></p>
+    </div>
+  </header>
+  <main class="page-width page-main lesson-body">
+    <section class="tech-card card-pad">
+      <h2>Before the explanation</h2>
+      <p>When the window first opens, what is <code>latest_result</code>?</p>
+      <div data-quiz data-feedback-correct="Correct. There is no fetched weather result at startup, so the state is represented by None." data-feedback-wrong="Find the field type and the constructor value in CyberWeatherApp::new.">
+        <div class="quiz-options">
+          <button class="quiz-option" data-quiz-option data-correct="true">Latest result starts empty</button>
+          <button class="quiz-option" data-quiz-option>Latest result starts ready</button>
+          <button class="quiz-option" data-quiz-option>Latest result starts loading</button>
+        </div>
+        <button class="action-button tech-action" data-check-quiz>Check my answer</button>
+        <p class="quiz-feedback" data-quiz-feedback role="status" hidden></p>
+      </div>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>The app struct is its notebook</h2>
+      <p><code>CyberWeatherApp</code> in <code>app.rs</code> owns the current screen state: input strings, selected mode, loading/status text, the latest result, animation preferences, history, and a receiver for background-worker messages.</p>
+      <pre><code>struct CyberWeatherApp {
+    input_mode: InputMode,
+    city_input: String,
+    loading: bool,
+    status_text: String,
+    latest_result: Option&lt;WeatherQueryResult&gt;,
+    history_entries: Vec&lt;HistoryEntry&gt;,
+    worker_rx: Option&lt;Receiver&lt;WorkerMessage&gt;&gt;,
+}</code></pre>
+      <p>This is a sketch of the real struct. Its constructor sets a ready status, a default city and dates, no result yet, and any saved history it can load. State is like the shopkeeper's ledger: it records the current situation, while later UI code reads it to decide what to show.</p>
+      <div class="callout"><strong>Pythonista lens — a struct is a fixed data shape:</strong> You can picture <code>CyberWeatherApp</code> as a typed dataclass whose fields have declared types. Unlike a Python instance that can freely gain or change attributes at runtime, this struct has a known set of fields and each field keeps its declared type. Rust also does not call a special <code>__init__</code> automatically: this project writes a <code>new</code> method to build a complete app value. Notice <code>Option&lt;WeatherQueryResult&gt;</code>: the app starts with <code>None</code>, then holds <code>Some(result)</code> after success. That explicit absence keeps “not loaded yet” distinct from a real result.</div>
+      <div class="trace" aria-label="Startup state trace">
+        <div class="trace-step"><strong>Input</strong>Default city and dates</div>
+        <div class="trace-step"><strong>Result</strong><code>None</code></div>
+        <div class="trace-step"><strong>Loading</strong><code>false</code></div>
+        <div class="trace-step"><strong>Status</strong>Ready</div>
+      </div>
+      <p><a href="https://github.com/feenix100/rusty_weather/blob/main/src/app.rs">Open app.rs</a> · <a href="https://doc.rust-lang.org/book/ch06-02-match.html">Rust Book: match and enums</a></p>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Practice: make a state table</h2>
+      <p>Trace the constructor, then fill in these values before you click “Get Weather” in the app:</p>
+      <ul>
+        <li>Is a request running?</li>
+        <li>Does a result exist?</li>
+        <li>What status text should the interface show?</li>
+        <li>What does the receiver field contain before the first request?</li>
+      </ul>
+      <details class="answer-note">
+        <summary>Check after your attempt</summary>
+        <p>At startup: <code>loading</code> is false, <code>latest_result</code> is <code>None</code>, status says “Ready,” and <code>worker_rx</code> is <code>None</code>. The constructor also loads history or falls back to an empty vector.</p>
+      </details>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Watch and read</h2>
+      <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=515s">Video: app state and constructor, around 8:35</a>.</p>
+      <p>Read the <code>CyberWeatherApp</code> fields and <code>new</code> method together. Next: <a href="0004-validate-input.html">turn user text into a valid request</a>.</p>
+      <p class="small-note">Ask me about ownership, <code>Option</code>, or any field you want to trace more slowly.</p>
+    </section>
+
+    <div class="lesson-footer">
+      <button class="action-button" data-complete aria-pressed="false">Mark lesson complete</button>
+      <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a class="button-link" href="0002-model-the-domain.html">Previous: data shapes</a>
+        <a class="button-link" href="0004-validate-input.html">Next: validate input</a>
+      </nav>
+    </div>
+  </main>
+  <footer class="page-width course-foot">Progress is saved locally in this browser when you choose “Mark lesson complete.”</footer>
+  <script src="../assets/course.js"></script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A practical Rust course built around a real desktop weather app.">
+  <title>Rusty Weather — Study Course</title>
+  <link rel="stylesheet" href="assets/tech-course-theme.css">
+  <link rel="stylesheet" href="assets/course.css">
+</head>
+<body class="tech-course">
+  <header class="tech-course__header course-top">
+    <div class="page-width">
+      <p class="eyebrow">Rust project study · 10 short lessons</p>
+      <h1>Learn Rust by tracing a weather app</h1>
+      <p>Follow the video, open the matching source, predict what happens, then make a small change. Think of the program like a Lagos market: each module has its own stall, and the messages between them keep the work moving.</p>
+      <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y">Open the 42-minute video</a> · <a href="https://github.com/feenix100/rusty_weather">Open the reference repository</a></p>
+    </div>
+  </header>
+
+  <main class="page-width page-main stack">
+    <section class="tech-card card-pad" id="guided-study">
+      <h2>Your guided study plan</h2>
+      <p>This course is for a Python developer learning Rust by reading one real app. Take one lesson at a time; you do not need to understand the whole codebase before you begin. In each lesson, make a prediction, watch the short video section, trace the related source, try the exercise, and only then open the answer.</p>
+      <ol>
+        <li><strong>Predict first.</strong> Say what you think the code will do. A wrong first guess is useful because it shows us which idea to unpack.</li>
+        <li><strong>Watch the assigned clip.</strong> Use the time range in the lesson. Pause or replay; the clip is a guide, not a race.</li>
+        <li><strong>Read the Rust slowly.</strong> Follow one value through the functions. Notice its type, who owns it, and whether a function borrows or consumes it.</li>
+        <li><strong>Try the task before the answer.</strong> If you get stuck, use the hints or ask for a smaller clue.</li>
+        <li><strong>Explain the why.</strong> Connect the design to Python and say what Rust's compiler is checking for.</li>
+      </ol>
+      <p>For each new idea, the explanation will cover what the code does, why this Rust design is useful, what a Pythonista might expect instead, and what subtle type or ownership rule to notice. We will use Nigerian examples where they make the idea clearer: a market ledger, a danfo route, or a dispatch rider carrying a message. The metaphors help us remember the rule; the Rust type and code remain the precise version.</p>
+      <p>Python and Rust are not one-to-one. For example, a Rust <code>Option&lt;T&gt;</code> makes a missing value explicit in the type, while Python commonly uses <code>None</code> at runtime. Rust's <code>Result&lt;T, E&gt;</code> makes a success-or-error path explicit, while Python code often raises or catches exceptions. When ownership and borrowing appear, we will compare Rust's compile-time rules with Python's runtime-managed object lifetimes rather than pretending the two behave identically.</p>
+      <h3>Instructions for guided sessions</h3>
+      <p>When using this course with a tutor, ask them to stay on the current lesson and explain each new Rust choice in detail: what it means, why this project uses it, what the closest Python pattern is, and where the comparison stops matching. Ask them to pause on compiler messages and unpack terms such as type inference, <code>Option</code>, <code>Result</code>, ownership, move, borrow, and <code>&amp;mut</code> when they appear. Work one small step at a time; do not jump straight to a finished solution. Before changing or deleting code in Zed, get the exact Vim-mode cursor motion and edit keys. Keep the explanation readable within the page margins and use Nigerian metaphors when they clarify the idea.</p>
+    </section>
+
+    <section class="tech-card card-pad" id="first-run">
+      <h2>Start here: create our Rust crate in this folder</h2>
+      <ol>
+        <li>Open the regular Tuxedo OS Terminal.</li>
+        <li>Move into the course folder using its absolute path, then check that the terminal is standing in the right place:<pre><code>cd "/home/siseng/Documents/08_Personal/programing_languages/Rust/weather_app" &amp;&amp; pwd</code></pre>The <code>pwd</code> output should be exactly the folder shown in the <code>cd</code> command. This check matters: Cargo creates files in the terminal's current folder, like a dispatch rider delivering a parcel to the address written on the waybill.</li>
+        <li>If there is not already a <code>Cargo.toml</code> in this folder, create the executable crate here:<pre><code>cargo init --bin --vcs none</code></pre></li>
+        <li>Open the whole project folder in Zed from that same terminal:<pre><code>zed .</code></pre>If the terminal says <code>zed: command not found</code>, open Zed from the Tuxedo OS app launcher and choose <strong>File → Open Folder</strong>, then select the same course folder. In Zed's file tree, open <code>src/main.rs</code>. We open the folder so the editor can show the Rust source, <code>Cargo.toml</code>, and our lesson notes together.</li>
+        <li>Back in the terminal, start the new crate from this folder:<pre><code>cargo run</code></pre></li>
+      </ol>
+      <p>Use <code>cargo init</code> because this folder already contains our lessons; <code>cargo new</code> would create a second nested folder. The <code>--bin</code> flag asks Cargo for an executable crate, and <code>--vcs none</code> keeps Cargo from trying to initialize Git before we deliberately set up the project repository. Cargo creates <code>Cargo.toml</code> and <code>src/main.rs</code>. Then <code>cargo run</code> compiles and launches the starter program. If the folder already has a <code>Cargo.toml</code>, do not initialize it again; tell me what you see and we will inspect it together.</p>
+      <p>We will grow this crate in the current folder as we learn. The video and <a href="https://github.com/feenix100/rusty_weather">reference app</a> are our map, not a clone we edit. Keep the first run simple: the app's <code>main.rs</code> is the gate at a busy market; it starts the program, and later we will add the stalls that do the actual work.</p>
+    </section>
+
+    <section class="tech-card card-pad" id="github-progress">
+      <h2>Keep progress and publish the lessons</h2>
+      <p>We will make a small Git commit at each learning milestone, then push those snapshots to a new public GitHub repository. A commit is like a dated page in our market ledger; a push carries that page to GitHub so we can share and continue the work from another machine.</p>
+      <ol>
+        <li>Start and run the local crate.</li>
+        <li>Check Git's current root with <code>git rev-parse --show-toplevel</code>. We will make sure Git sees this weather project before staging any files.</li>
+        <li>Initialize this folder as its own repository, inspect the staged files, and commit the first checkpoint.</li>
+        <li>Create an empty public GitHub repository, connect it as <code>origin</code>, then push the checkpoint to <code>main</code>.</li>
+        <li>The workflow at <code>.github/workflows/pages.yml</code> assembles only the lesson files and publishes them after a push to <code>main</code>.</li>
+        <li>Put the published lesson URL in the root <code>README.md</code>, so readers can open the course in a browser without cloning the code.</li>
+      </ol>
+      <p>Before the first Pages deployment, choose <strong>Settings → Pages → Build and deployment → Source → GitHub Actions</strong>. On GitHub Free, Pages is available for public repositories; the published Pages site itself is public, so never put secrets in the course or crate. The README has a placeholder for the live link until the repository name and owner are settled.</p>
+      <p class="small-note">We will take the Git steps together. First we will check which repository Git sees, then stage only this project, inspect the staged files, commit, connect the remote, and push. No command should scoop up the parent Rustlings workspace by accident. GitHub Actions can publish the Pages artifact, but it does not create the repository or upload our local commits; Git push does that.</p>
+      <details>
+        <summary>Git steps we will do together after the crate runs</summary>
+        <p>First we check the current root. We do not stage anything until the output identifies this weather project as its own repository:</p>
+        <pre><code>git rev-parse --show-toplevel
+git status --short</code></pre>
+        <p>Then we initialize Git, inspect the files before committing, and save the first checkpoint:</p>
+        <pre><code>git init -b main
+git add -A
+git status --short
+git commit -m "Start Rust weather learning project"</code></pre>
+        <p>On GitHub, create an empty <strong>public</strong> repository under the account you want to use. Leave “Add a README” unchecked because our local README already exists. Authenticate the terminal with <code>gh auth login</code>, verify it with <code>gh auth status</code>, then replace the placeholders in these commands with the actual owner and repository:</p>
+        <pre><code>git remote add origin https://github.com/theAfricanQuant/weather_app.git
+git push -u origin main</code></pre>
+        <p>We will run each command only after checking the previous output. If <code>git init</code> reports a permission error or <code>git rev-parse</code> still points at the parent Rustlings folder after initialization, stop there and ask for help before staging.</p>
+      </details>
+    </section>
+
+    <section class="tech-card card-pad" id="zed-vim">
+      <h2>Zed with Vim bindings</h2>
+      <p>Use these common Vim-mode keys while editing. Press <code>Esc</code> to return to normal mode; press <code>i</code> to insert text. In normal mode, <code>h</code>, <code>j</code>, <code>k</code>, and <code>l</code> move left, down, up, and right; <code>w</code> and <code>b</code> move by words.</p>
+      <p>For a line edit, first navigate to the line and check that it is the right one. <code>dd</code> deletes the current line, <code>u</code> undoes the last edit, and <code>:w</code> saves. Before any deletion exercise, the lesson will tell you what to find and which keys to press. Zed's Vim mode is configurable and is not identical to every Vim setup; see the <a href="https://zed.dev/docs/vim">Zed Vim mode guide</a>.</p>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>How to use the video</h2>
+      <p>There is one 42:05 video. You do not need to watch it all before starting. Work through one course lesson at a time: try the opening question, watch that lesson's clip, inspect the linked source, do the small task, then check the feedback and mark the lesson complete. Open each video link at its start time and stop near the end time below.</p>
+      <ul>
+        <li><strong>Lesson 1:</strong> 02:14–04:17 — startup and modules.</li>
+        <li><strong>Lesson 2:</strong> 04:17–08:35 — model types.</li>
+        <li><strong>Lesson 3:</strong> 08:35–12:22 — app state and constructor.</li>
+        <li><strong>Lesson 4:</strong> 15:05–17:35 — validation and dates.</li>
+        <li><strong>Lesson 5:</strong> 12:22–15:05 — worker thread and message channel. This clip comes before Lesson 4 in the video, so you will jump back.</li>
+        <li><strong>Lesson 6:</strong> 32:41–34:37 — service flow and weather request.</li>
+        <li><strong>Lesson 7:</strong> 34:37–35:55 — parsing the response and day records.</li>
+        <li><strong>Lesson 8:</strong> 18:33–25:08 — drawing the interface, then 37:44–39:02 — the update loop.</li>
+        <li><strong>Lesson 9:</strong> 35:55–37:44 — history and CSV export.</li>
+        <li><strong>Lesson 10:</strong> no new video clip; use the project source and build the city preset.</li>
+      </ul>
+      <p class="small-note">Optional: watch 00:00–02:14 for the introduction and app demo, 25:08–32:41 for extra Rust discussion, and 39:02–42:05 for the recap.</p>
+    </section>
+
+    <section class="tech-card card-pad tech-mission">
+      <p class="eyebrow">Your mission</p>
+      <h2>Build my first Rust project with the weather app as our guide</h2>
+      <p>My goal is to use the weather app as a guide to learn how Rust projects are scaffolded and organized while I build my first Rust project. We will start with Cargo's generated files, then follow how the crate grows into modules, types, and features.</p>
+      <p>By the end, I should be able to explain what <code>Cargo.toml</code>, <code>src/main.rs</code>, crates, and modules do; trace one weather lookup through the app; and make a small change while explaining the Rust choices involved.</p>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Your progress</h2>
+      <p data-progress-text>Progress is stored in this browser on this device.</p>
+      <div class="progress-track" role="progressbar" aria-label="Course lessons completed" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0">
+        <div class="progress-fill" data-progress-fill></div>
+      </div>
+      <p class="small-note">Progress counts lessons you mark complete. It is not a mastery score; learning records are added only after you demonstrate an idea in conversation or code.</p>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Course path</h2>
+      <ol class="course-list">
+        <li><a href="lessons/0001-orient-and-run.html" data-lesson-link="lesson-01"><span class="lesson-number">01</span><span class="lesson-title">Find the front door<span class="lesson-summary">Cargo, modules, and the desktop startup path</span></span><span class="lesson-time" data-status>Next · 10 min</span></a></li>
+        <li><a href="lessons/0002-model-the-domain.html" data-lesson-link="lesson-02"><span class="lesson-number">02</span><span class="lesson-title">Give the data a shape<span class="lesson-summary">Enums, structs, Option, and valid request variants</span></span><span class="lesson-time" data-status>Next · 12 min</span></a></li>
+        <li><a href="lessons/0003-app-state.html" data-lesson-link="lesson-03"><span class="lesson-number">03</span><span class="lesson-title">Keep the app's state in one place<span class="lesson-summary">The CyberWeatherApp struct and startup defaults</span></span><span class="lesson-time" data-status>Next · 10 min</span></a></li>
+        <li><a href="lessons/0004-validate-input.html" data-lesson-link="lesson-04"><span class="lesson-number">04</span><span class="lesson-title">Turn text into a valid request<span class="lesson-summary">Date parsing, number parsing, match, and Result</span></span><span class="lesson-time" data-status>Next · 12 min</span></a></li>
+        <li><a href="lessons/0005-background-worker.html" data-lesson-link="lesson-05"><span class="lesson-number">05</span><span class="lesson-title">Keep the window responsive<span class="lesson-summary">A worker thread, move, and the message channel</span></span><span class="lesson-time" data-status>Next · 12 min</span></a></li>
+        <li><a href="lessons/0006-geocode-and-request.html" data-lesson-link="lesson-06"><span class="lesson-number">06</span><span class="lesson-title">Translate a place into a weather request<span class="lesson-summary">Geocoding, coordinates, and forecast/archive routing</span></span><span class="lesson-time" data-status>Next · 12 min</span></a></li>
+        <li><a href="lessons/0007-normalize-api-data.html" data-lesson-link="lesson-07"><span class="lesson-number">07</span><span class="lesson-title">Clean the API response at the boundary<span class="lesson-summary">Serde, optional fields, and day records</span></span><span class="lesson-time" data-status>Next · 12 min</span></a></li>
+        <li><a href="lessons/0008-render-the-state.html" data-lesson-link="lesson-08"><span class="lesson-number">08</span><span class="lesson-title">Render the current state<span class="lesson-summary">egui's update loop, results, and animations</span></span><span class="lesson-time" data-status>Next · 12 min</span></a></li>
+        <li><a href="lessons/0009-history-and-export.html" data-lesson-link="lesson-09"><span class="lesson-number">09</span><span class="lesson-title">Save the work and carry it out<span class="lesson-summary">JSON history, CSV export, and visible errors</span></span><span class="lesson-time" data-status>Next · 10 min</span></a></li>
+        <li><a href="lessons/0010-capstone.html" data-lesson-link="lesson-10"><span class="lesson-number">10</span><span class="lesson-title">Add one more city<span class="lesson-summary">A small end-to-end change in the real repository</span></span><span class="lesson-time" data-status>Next · 20 min</span></a></li>
+      </ol>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Use the reference project as a map</h2>
+      <p>The linked upstream repository is a complete example. We will read its modules and compare its choices with our smaller crate as we build. Its city/state geocoder currently limits results to the United States; coordinate mode supports other locations.</p>
+      <p><a href="README.md">Setup and publishing notes</a> · <a href="MISSION.md">Mission</a> · <a href="RESOURCES.md">Annotated resources</a> · <a href="reference/project-map.html">Printable project map</a> · <a href="reference/request-lifecycle.html">Printable request flow</a> · <a href="reference/rust-patterns.html">Rust pattern card</a></p>
+    </section>
+  </main>
+
+  <footer class="page-width course-foot">Short lessons. One real code path at a time. Ask follow-up questions whenever a compiler message or concept feels unclear.</footer>
+  <script src="assets/course.js"></script>
+</body>
+</html>

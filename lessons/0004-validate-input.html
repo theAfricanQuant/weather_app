@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>04 · Turn text into a valid request</title>
+  <link rel="stylesheet" href="../assets/tech-course-theme.css">
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body class="tech-course" data-lesson-id="lesson-04">
+  <header class="tech-course__header course-top">
+    <div class="page-width">
+      <p class="eyebrow">Lesson 04 of 10 · about 12 minutes</p>
+      <h1>Turn text into a valid request</h1>
+      <p>Today's win: follow a bad date or coordinate to the exact place it becomes an error.</p>
+      <p class="small-note"><a href="../index.html#guided-study">How we study as a Pythonista</a> · <a href="../index.html#zed-vim">Zed Vim keys</a></p>
+    </div>
+  </header>
+  <main class="page-width page-main lesson-body">
+    <section class="tech-card card-pad">
+      <h2>Before the explanation</h2>
+      <p><code>parse_date_range</code> returns a <code>Result</code>. What should it return when both dates parse and the start is not after the end?</p>
+      <div data-quiz data-feedback-correct="Yes. Ok carries the successfully parsed date pair; Err carries a message when validation fails." data-feedback-wrong="Remember: Result has Ok for a value and Err for a failure. Option represents presence or absence.">
+        <div class="quiz-options">
+          <button class="quiz-option" data-quiz-option>For failed parsing return Err</button>
+          <button class="quiz-option" data-quiz-option data-correct="true">For valid input return Ok</button>
+          <button class="quiz-option" data-quiz-option>For absent dates return None</button>
+        </div>
+        <button class="action-button tech-action" data-check-quiz>Check my answer</button>
+        <p class="quiz-feedback" data-quiz-feedback role="status" hidden></p>
+      </div>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Validation is a gate with a receipt</h2>
+      <p>The UI starts with strings because that is what text boxes hold. Before networking, <code>build_request</code> checks the date range, matches on the input mode, trims fields, parses coordinate strings into <code>f64</code>, and builds the typed request. The functions return <code>Result</code> so an invalid input has a clear path back to a status message.</p>
+      <pre><code>fn parse_date_range(&amp;self) -&gt; Result&lt;(NaiveDate, NaiveDate), String&gt; {
+    let start = date_utils::parse_date(&amp;self.start_date_input)?;
+    let end = date_utils::parse_date(&amp;self.end_date_input)?;
+    if start &gt; end {
+        return Err("Start date must be on or before End date.".to_owned());
+    }
+    Ok((start, end))
+}</code></pre>
+      <p>This omits the empty-field checks to keep the pattern visible. The <code>?</code> operator returns early if parsing fails. The final <code>Ok</code> is reached only after both dates pass the order check.</p>
+      <div class="callout"><strong>Pythonista lens — recoverable errors are values:</strong> You may be used to wrapping parsing in <code>try/except</code>. This function instead returns <code>Result&lt;T, E&gt;</code>: either <code>Ok(request)</code> or <code>Err(message)</code>. The <code>?</code> operator means “if this step failed, return that error from this function now; otherwise give me the successful value.” It works because the function itself promises a <code>Result</code>. That makes the error path visible in the function's type, and the UI can turn it into a status message instead of letting bad text reach the network layer.</div>
+      <p><a href="https://github.com/feenix100/rusty_weather/blob/main/src/app.rs">Find parse_date_range and build_request in app.rs</a> · <a href="https://github.com/feenix100/rusty_weather/blob/main/src/date_utils.rs">Read date_utils.rs</a></p>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Practice: become the compiler</h2>
+      <ol>
+        <li>Read <code>parse_date_range</code> and say which line runs if the start date is later than the end date.</li>
+        <li>Read <code>build_request</code>. Trace what happens when latitude contains the text <code>west</code>.</li>
+        <li>In the running app, try a reversed date range and then a non-numeric coordinate. Observe the status label.</li>
+        <li>Run <code>cargo check</code> after any small experiment; use the first compiler error as the next clue.</li>
+      </ol>
+      <details class="answer-note">
+        <summary>Check after your attempt</summary>
+        <p>A reversed range returns <code>Err</code> with the date-order message. Parsing <code>west</code> as <code>f64</code> fails and maps to the friendly “Invalid latitude” message. Neither case starts a worker.</p>
+      </details>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Watch and read</h2>
+      <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=905s">Video: input validation and dates, around 15:05</a>.</p>
+      <p>Primary references: <a href="https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html">Rust Book: Result</a> and <a href="https://docs.rs/chrono/latest/chrono/naive/struct.NaiveDate.html">Chrono NaiveDate</a>. Next: <a href="0005-background-worker.html">keep the GUI responsive during the request</a>.</p>
+      <p class="small-note">Ask me to walk through <code>?</code>, <code>match</code>, or a compiler diagnostic line by line.</p>
+    </section>
+
+    <div class="lesson-footer">
+      <button class="action-button" data-complete aria-pressed="false">Mark lesson complete</button>
+      <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a class="button-link" href="0003-app-state.html">Previous: app state</a>
+        <a class="button-link" href="0005-background-worker.html">Next: worker thread</a>
+      </nav>
+    </div>
+  </main>
+  <footer class="page-width course-foot">Progress is saved locally in this browser when you choose “Mark lesson complete.”</footer>
+  <script src="../assets/course.js"></script>
+</body>
+</html>

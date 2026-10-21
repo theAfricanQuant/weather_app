@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rusty Weather · Request Lifecycle</title>
+  <link rel="stylesheet" href="../assets/tech-course-theme.css">
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body class="tech-course">
+  <header class="tech-course__header course-top">
+    <div class="page-width">
+      <p class="eyebrow">Print reference</p>
+      <h1>One weather lookup, end to end</h1>
+      <p>A trace card for connecting the lessons when you revisit the project.</p>
+    </div>
+  </header>
+  <main class="page-width page-main lesson-body">
+    <section class="tech-card card-pad">
+      <h2>Happy path</h2>
+      <div class="trace">
+        <div class="trace-step"><strong>1 · UI input</strong><code>draw_inputs</code> reads strings and mode.</div>
+        <div class="trace-step"><strong>2 · Typed request</strong><code>build_request</code> validates and creates <code>WeatherQueryRequest</code>.</div>
+        <div class="trace-step"><strong>3 · Worker thread</strong><code>start_fetch</code> moves the request into a thread.</div>
+        <div class="trace-step"><strong>4 · Location</strong>City/state is geocoded; coordinates are range-checked.</div>
+        <div class="trace-step"><strong>5 · Weather API</strong>Choose archive, forecast, or both for a crossing date range.</div>
+        <div class="trace-step"><strong>6 · Internal records</strong>Deserialize JSON and build daily records with optional fields.</div>
+        <div class="trace-step"><strong>7 · Message return</strong>Send <code>Success(result)</code> through <code>mpsc</code>.</div>
+        <div class="trace-step"><strong>8 · UI update</strong>Store result, choose animation, save history, and draw next frame.</div>
+      </div>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Where errors appear</h2>
+      <ul>
+        <li><strong>Input validation:</strong> a bad date, reversed range, empty location, or non-numeric coordinate returns a user-readable <code>Err</code> before the worker starts.</li>
+        <li><strong>Geocoding:</strong> network, HTTP status, JSON parsing, and missing result errors become a worker error message. The current city/state search is US-only.</li>
+        <li><strong>Weather request:</strong> network/status failures and malformed JSON become a worker error message.</li>
+        <li><strong>Persistence:</strong> weather can load successfully while history saving fails; the status message reports that difference.</li>
+      </ul>
+      <p>The key habit: follow the returned <code>Result</code> value to its caller. An error does not teleport away; each boundary decides how to report or recover from it.</p>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Source links</h2>
+      <ul>
+        <li><a href="https://github.com/feenix100/rusty_weather/blob/main/src/app.rs">app.rs: input, start_fetch, poll_worker, and update</a></li>
+        <li><a href="https://github.com/feenix100/rusty_weather/blob/main/src/weather_service.rs">weather_service.rs: location, endpoint, and response flow</a></li>
+        <li><a href="https://github.com/feenix100/rusty_weather/blob/main/src/geocoding_service.rs">geocoding_service.rs: city resolution</a></li>
+        <li><a href="https://github.com/feenix100/rusty_weather/blob/main/src/history_service.rs">history_service.rs: save and export</a></li>
+      </ul>
+      <p><a href="../index.html">Return to the course</a></p>
+    </section>
+    <p class="small-note">Print setting: use default scale. Text and diagram blocks share the same page width.</p>
+  </main>
+</body>
+</html>

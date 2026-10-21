@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rusty Weather · Project Map</title>
+  <link rel="stylesheet" href="../assets/tech-course-theme.css">
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body class="tech-course">
+  <header class="tech-course__header course-top">
+    <div class="page-width">
+      <p class="eyebrow">Print reference</p>
+      <h1>Rusty Weather project map</h1>
+      <p>Use this page to orient yourself before opening a source file.</p>
+    </div>
+  </header>
+  <main class="page-width page-main lesson-body">
+    <section class="tech-card card-pad">
+      <h2>Top-level path</h2>
+      <pre><code>src/
+├── main.rs                 // module list and native app startup
+├── app.rs                  // GUI state, input, worker messages, rendering
+├── models.rs               // request, response, history, and UI types
+├── date_utils.rs           // parse and format date values
+├── geocoding_service.rs    // US city/state to coordinates
+├── weather_service.rs      // Open-Meteo request and response mapping
+├── weather_code_map.rs     // weather codes to readable labels/modes
+├── history_service.rs      // local JSON and CSV export
+└── animation.rs            // weather visuals</code></pre>
+      <p>Source references: <a href="https://github.com/feenix100/rusty_weather/tree/main/src">src directory</a> and <a href="https://github.com/feenix100/rusty_weather/blob/main/Cargo.toml">Cargo manifest</a>.</p>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Who owns each job?</h2>
+      <div class="trace">
+        <div class="trace-step"><strong>main.rs</strong>Builds native window options and starts eframe.</div>
+        <div class="trace-step"><strong>models.rs</strong>Names the data that crosses module boundaries.</div>
+        <div class="trace-step"><strong>app.rs</strong>Owns live UI state and coordinates the user's actions.</div>
+        <div class="trace-step"><strong>Services</strong>Handle network requests and local persistence.</div>
+      </div>
+      <p>Analogy: main.rs is the market entrance, app.rs is the central desk, and the service modules are specialist stalls. The shared models tell each stall what shape of request or result to expect.</p>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>One request at a glance</h2>
+      <div class="trace">
+        <div class="trace-step"><strong>1 · Input</strong>Strings and selected mode in app state.</div>
+        <div class="trace-step"><strong>2 · Validate</strong>Dates, city/state or parsed coordinates.</div>
+        <div class="trace-step"><strong>3 · Worker</strong>Blocking network work runs off the UI thread.</div>
+        <div class="trace-step"><strong>4 · Normalize</strong>JSON becomes internal weather records.</div>
+        <div class="trace-step"><strong>5 · Return</strong>A message channel delivers success or error.</div>
+        <div class="trace-step"><strong>6 · Present</strong>Update result, history, animation, and status.</div>
+      </div>
+      <p><a href="request-lifecycle.html">Open the detailed request flow</a> · <a href="../index.html">Return to the course</a></p>
+    </section>
+    <p class="small-note">Print setting: use default scale. Page margins are set for an uncluttered handout.</p>
+  </main>
+  <script src="../assets/course.js"></script>
+</body>
+</html>

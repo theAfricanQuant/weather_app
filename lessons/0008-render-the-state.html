@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>08 · Render the current state</title>
+  <link rel="stylesheet" href="../assets/tech-course-theme.css">
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body class="tech-course" data-lesson-id="lesson-08">
+  <header class="tech-course__header course-top">
+    <div class="page-width">
+      <p class="eyebrow">Lesson 08 of 10 · about 12 minutes</p>
+      <h1>Render the current state</h1>
+      <p>Today's win: tell the difference between app state and the pixels drawn from it.</p>
+      <p class="small-note"><a href="../index.html#guided-study">How we study as a Pythonista</a> · <a href="../index.html#zed-vim">Zed Vim keys</a></p>
+    </div>
+  </header>
+  <main class="page-width page-main lesson-body">
+    <section class="tech-card card-pad">
+      <h2>Before the explanation</h2>
+      <p>Which statement best describes eframe's <code>update</code> method in this app?</p>
+      <div data-quiz data-feedback-correct="Correct. update reads the current state, lays out the widgets, and schedules another frame for the animation." data-feedback-wrong="Read the body of update: it polls messages, draws panels, then asks egui for another repaint.">
+        <div class="quiz-options">
+          <button class="quiz-option" data-quiz-option data-correct="true">update reads state, builds UI</button>
+          <button class="quiz-option" data-quiz-option>update starts the weather request</button>
+          <button class="quiz-option" data-quiz-option>update parses the weather JSON</button>
+        </div>
+        <button class="action-button tech-action" data-check-quiz>Check my answer</button>
+        <p class="quiz-feedback" data-quiz-feedback role="status" hidden></p>
+      </div>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>State flows into the screen</h2>
+      <p>The app implements <code>eframe::App</code>. Its <code>update</code> method polls the worker channel, applies text scaling, draws the header, controls, results, animation, and history, then requests another repaint after 16 milliseconds so the animation moves smoothly.</p>
+      <div class="trace" aria-label="Immediate mode drawing">
+        <div class="trace-step"><strong>Read</strong>Current app state</div>
+        <div class="trace-step"><strong>Build</strong>Widgets for this frame</div>
+        <div class="trace-step"><strong>Interact</strong>Buttons may change state</div>
+        <div class="trace-step"><strong>Repeat</strong>Repaint for next frame</div>
+      </div>
+      <p>This is immediate-mode UI: describe what the interface should look like for the current state each frame. The button interaction can change state; the next update draws the new state. For example, a result of <code>None</code> displays “No weather result yet,” while <code>Some(result)</code> displays the forecast.</p>
+      <div class="callout"><strong>Pythonista lens — render from state on every update:</strong> In many Python GUI frameworks you create widgets and then update individual widget properties as events arrive. This egui pattern asks the app to describe the screen again from its current state during <code>update</code>. A click changes state; the next frame reflects that change. The method receives <code>&amp;mut self</code>, a mutable borrow of the app: it can update fields while Rust keeps track of who may read or change that app value at the same time. Treat this as a useful compiler clue, not punctuation to ignore.</div>
+      <p><a href="https://github.com/feenix100/rusty_weather/blob/main/src/app.rs">Find update and draw_latest_result in app.rs</a> · <a href="https://docs.rs/eframe/latest/eframe/trait.App.html">eframe App trait</a></p>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Practice: trace a button click</h2>
+      <ol>
+        <li>Find the “Get Weather” button in <code>draw_inputs</code>.</li>
+        <li>Which method runs when it is clicked?</li>
+        <li>Find where <code>latest_result</code> is read in <code>draw_latest_result</code>.</li>
+        <li>Explain why the empty-state message appears before the first successful request.</li>
+      </ol>
+      <details class="answer-note">
+        <summary>Check after your attempt</summary>
+        <p>The button calls <code>start_fetch</code>. A successful worker message stores a result; the rendering method matches on <code>Option</code>. Since the constructor starts with <code>None</code>, the empty-state message appears before the first result.</p>
+      </details>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Watch and read</h2>
+      <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=1113s">Video: drawing the interface, around 18:33–25:08</a> · <a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=2264s">Video: the app update loop, around 37:44–39:02</a>.</p>
+      <p>Primary reference: <a href="https://docs.rs/eframe/latest/eframe/trait.App.html">eframe App</a>. Next: <a href="0009-history-and-export.html">keep searches after the window closes</a>.</p>
+      <p class="small-note">Ask me about immediate-mode UI, repaint timing, or how the result card handles missing fields.</p>
+    </section>
+
+    <div class="lesson-footer">
+      <button class="action-button" data-complete aria-pressed="false">Mark lesson complete</button>
+      <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a class="button-link" href="0007-normalize-api-data.html">Previous: normalize response</a>
+        <a class="button-link" href="0009-history-and-export.html">Next: history and export</a>
+      </nav>
+    </div>
+  </main>
+  <footer class="page-width course-foot">Progress is saved locally in this browser when you choose “Mark lesson complete.”</footer>
+  <script src="../assets/course.js"></script>
+</body>
+</html>

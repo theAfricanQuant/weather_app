@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>06 · Translate a place into a weather request</title>
+  <link rel="stylesheet" href="../assets/tech-course-theme.css">
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body class="tech-course" data-lesson-id="lesson-06">
+  <header class="tech-course__header course-top">
+    <div class="page-width">
+      <p class="eyebrow">Lesson 06 of 10 · about 12 minutes</p>
+      <h1>Translate a place into a weather request</h1>
+      <p>Today's win: follow a city name or a coordinate pair to the API endpoint it needs.</p>
+      <p class="small-note"><a href="../index.html#guided-study">How we study as a Pythonista</a> · <a href="../index.html#zed-vim">Zed Vim keys</a></p>
+    </div>
+  </header>
+  <main class="page-width page-main lesson-body">
+    <section class="tech-card card-pad">
+      <h2>Before the explanation</h2>
+      <p>For a city/state query, what happens before the weather forecast request?</p>
+      <div data-quiz data-feedback-correct="Correct. The geocoder resolves the US city/state input to coordinates before weather data is requested." data-feedback-wrong="Follow fetch_weather and inspect the LocationQuery match arms.">
+        <div class="quiz-options">
+          <button class="quiz-option" data-quiz-option data-correct="true">City input calls geocoding first</button>
+          <button class="quiz-option" data-quiz-option>Coordinates input call geocoding first</button>
+          <button class="quiz-option" data-quiz-option>Neither route uses a network</button>
+        </div>
+        <button class="action-button tech-action" data-check-quiz>Check my answer</button>
+        <p class="quiz-feedback" data-quiz-feedback role="status" hidden></p>
+      </div>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>The route depends on the location type</h2>
+      <p><code>weather_service::fetch_weather</code> matches the request's location. A city/state input calls <code>geocoding_service</code> to get latitude, longitude, and a timezone hint. A coordinate input validates the numeric ranges and already has its coordinates.</p>
+      <div class="trace" aria-label="Location request routing">
+        <div class="trace-step"><strong>City and state</strong>Geocode to coordinates</div>
+        <div class="trace-step"><strong>Coordinates</strong>Validate latitude/longitude</div>
+        <div class="trace-step"><strong>Date range</strong>Choose archive or forecast</div>
+        <div class="trace-step"><strong>HTTP response</strong>Check status, then parse JSON</div>
+      </div>
+      <p>The geocoder is like a motor-park dispatcher who turns a place name into a destination pin. One important boundary: this repository's geocoder sends <code>countryCode=US</code> and searches for a US state. That city/state route is US-only in the current code. Coordinate mode is available for other regions.</p>
+      <p>Then <code>fetch_weather_range</code> chooses the forecast endpoint for today/future dates and the archive endpoint for dates in the past. A range crossing today is split into two calls and merged by date.</p>
+      <div class="callout"><strong>Pythonista lens — turn choices into typed routes:</strong> A Python implementation might pass a string like <code>"city"</code> or a dictionary and branch on it later. Here, matching on <code>LocationQuery</code> makes the two routes explicit: city/state first needs geocoding, while coordinates already identify a point. The function signatures also show what comes back and what can fail. This is useful when an HTTP request has several stages: resolve a place, choose the correct forecast or archive endpoint, then convert the response. The enum acts like a danfo ticket for one valid route at a time.</div>
+      <p><a href="https://github.com/feenix100/rusty_weather/blob/main/src/geocoding_service.rs">Open geocoding_service.rs</a> · <a href="https://github.com/feenix100/rusty_weather/blob/main/src/weather_service.rs">Open weather_service.rs</a></p>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Practice: trace two places</h2>
+      <ol>
+        <li>Follow the <code>CityState</code> arm in <code>fetch_weather</code> and list what the geocoder returns.</li>
+        <li>Follow the <code>Coordinates</code> arm. Find the latitude and longitude bounds.</li>
+        <li>In <code>fetch_weather_range</code>, predict which endpoint a date range entirely in the past uses.</li>
+        <li>Use the Open-Meteo documentation to identify the query parameters for latitude, longitude, dates, and timezone.</li>
+      </ol>
+      <details class="answer-note">
+        <summary>Check after your attempt</summary>
+        <p>City/state becomes a resolved city, region, coordinates, and optional timezone. Coordinate input is checked against latitude -90…90 and longitude -180…180. A range ending before today uses the archive endpoint.</p>
+      </details>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Watch and read</h2>
+      <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=1961s">Video: service flow and weather request, around 32:41–34:37</a>.</p>
+      <p>Primary references: <a href="https://open-meteo.com/en/docs/geocoding-api">Open-Meteo Geocoding API</a> and <a href="https://open-meteo.com/en/docs">Open-Meteo Forecast API</a>. Next: <a href="0007-normalize-api-data.html">turn returned JSON into app data</a>.</p>
+      <p class="small-note">Ask me about the date boundary or the difference between a place name and coordinates.</p>
+    </section>
+
+    <div class="lesson-footer">
+      <button class="action-button" data-complete aria-pressed="false">Mark lesson complete</button>
+      <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a class="button-link" href="0005-background-worker.html">Previous: worker thread</a>
+        <a class="button-link" href="0007-normalize-api-data.html">Next: normalize response</a>
+      </nav>
+    </div>
+  </main>
+  <footer class="page-width course-foot">Progress is saved locally in this browser when you choose “Mark lesson complete.”</footer>
+  <script src="../assets/course.js"></script>
+</body>
+</html>

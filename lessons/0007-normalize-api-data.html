@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>07 · Clean the API response at the boundary</title>
+  <link rel="stylesheet" href="../assets/tech-course-theme.css">
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body class="tech-course" data-lesson-id="lesson-07">
+  <header class="tech-course__header course-top">
+    <div class="page-width">
+      <p class="eyebrow">Lesson 07 of 10 · about 12 minutes</p>
+      <h1>Clean the API response at the boundary</h1>
+      <p>Today's win: explain how optional JSON becomes a predictable vector of day records.</p>
+      <p class="small-note"><a href="../index.html#guided-study">How we study as a Pythonista</a> · <a href="../index.html#zed-vim">Zed Vim keys</a></p>
+    </div>
+  </header>
+  <main class="page-width page-main lesson-body">
+    <section class="tech-card card-pad">
+      <h2>Before the explanation</h2>
+      <p>If the API omits a daily measurement, what does this app place in the matching record slot?</p>
+      <div data-quiz data-feedback-correct="Yes. Missing measurements remain None, which keeps absence explicit instead of inventing a zero." data-feedback-wrong="Look at expand_f64_vec: it preserves a complete vector or fills the expected slots with None.">
+        <div class="quiz-options">
+          <button class="quiz-option" data-quiz-option data-correct="true">Missing daily field becomes None</button>
+          <button class="quiz-option" data-quiz-option>Missing daily field becomes zero</button>
+          <button class="quiz-option" data-quiz-option>Missing daily field stops parsing</button>
+        </div>
+        <button class="action-button tech-action" data-check-quiz>Check my answer</button>
+        <p class="quiz-feedback" data-quiz-feedback role="status" hidden></p>
+      </div>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Normalize at the boundary</h2>
+      <p><code>weather_service.rs</code> defines private structs that describe only the JSON fields this app needs. Serde's <code>Deserialize</code> derive maps JSON into those structs. The service then checks for the daily block and builds a clean <code>Vec&lt;WeatherDayRecord&gt;</code> for the rest of the program.</p>
+      <pre><code>#[derive(Debug, Deserialize)]
+struct OpenMeteoDaily {
+    time: Vec&lt;String&gt;,
+    temperature_2m_max: Option&lt;Vec&lt;f64&gt;&gt;,
+    temperature_2m_min: Option&lt;Vec&lt;f64&gt;&gt;,
+    precipitation_sum: Option&lt;Vec&lt;f64&gt;&gt;,
+    weather_code: Option&lt;Vec&lt;i32&gt;&gt;,
+}</code></pre>
+      <p>The <code>time</code> list establishes how many day records exist. Optional measurement arrays are expanded to that length. If an array is absent or has a mismatched length, its slots become <code>None</code>. Each record then carries a date, optional measurements, a readable description, and a source label.</p>
+      <p>Like a produce stall sorting a mixed delivery into labeled baskets, the service turns outside data into the app's own steady shape before the GUI handles it.</p>
+      <div class="callout"><strong>Pythonista lens — parse into known fields, then handle absence:</strong> In Python it is common to keep decoded JSON as nested dictionaries and discover a missing key when indexing it. Serde deserializes the response into Rust structs with named fields and declared types. Optional API fields become <code>Option&lt;T&gt;</code>, so a missing measurement is not silently confused with zero. The service normalizes uneven arrays before the rest of the app sees them; the GUI can then rely on one predictable record shape. This boundary is like checking a delivery at the market gate before sending it to each stall.</div>
+      <p><a href="https://github.com/feenix100/rusty_weather/blob/main/src/weather_service.rs">Open API structs and build_day_records</a> · <a href="https://github.com/feenix100/rusty_weather/blob/main/src/models.rs">Open the internal WeatherDayRecord type</a></p>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Practice: follow one missing value</h2>
+      <ol>
+        <li>Find the <code>response.json()</code> call. What type receives the parsed response?</li>
+        <li>Find <code>expand_f64_vec</code>. Trace its two branches.</li>
+        <li>Find where a numeric weather code becomes a description.</li>
+        <li>Explain why “no precipitation field” should not be converted to “0 mm” without evidence.</li>
+      </ol>
+      <details class="answer-note">
+        <summary>Check after your attempt</summary>
+        <p>The JSON is deserialized into <code>OpenMeteoResponse</code>. A present vector with the expected length is wrapped in <code>Some</code>; otherwise the code creates one <code>None</code> per day. Zero means measured absence of precipitation, while <code>None</code> means the value is unavailable.</p>
+      </details>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Watch and read</h2>
+      <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=2077s">Video: parsing the response and day records, around 34:37–35:55</a>.</p>
+      <p>Primary references: <a href="https://serde.rs/derive.html">Serde derive</a> and the <a href="https://open-meteo.com/en/docs">Open-Meteo response fields</a>.</p>
+      <p class="small-note">Ask me about Serde, nested Option types, or the reason API data is normalized before rendering.</p>
+    </section>
+
+    <div class="lesson-footer">
+      <button class="action-button" data-complete aria-pressed="false">Mark lesson complete</button>
+      <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a class="button-link" href="0006-geocode-and-request.html">Previous: API request</a>
+        <a class="button-link" href="0008-render-the-state.html">Next: render state</a>
+      </nav>
+    </div>
+  </main>
+  <footer class="page-width course-foot">Progress is saved locally in this browser when you choose “Mark lesson complete.”</footer>
+  <script src="../assets/course.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>05 · Keep the window responsive</title>
+  <link rel="stylesheet" href="../assets/tech-course-theme.css">
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body class="tech-course" data-lesson-id="lesson-05">
+  <header class="tech-course__header course-top">
+    <div class="page-width">
+      <p class="eyebrow">Lesson 05 of 10 · about 12 minutes</p>
+      <h1>Keep the window responsive</h1>
+      <p>Today's win: explain why the network call leaves the UI thread and how its result gets home.</p>
+      <p class="small-note"><a href="../index.html#guided-study">How we study as a Pythonista</a> · <a href="../index.html#zed-vim">Zed Vim keys</a></p>
+    </div>
+  </header>
+  <main class="page-width page-main lesson-body">
+    <section class="tech-card card-pad">
+      <h2>Before the explanation</h2>
+      <p>In this app, which thread owns the request while the network call is running?</p>
+      <div data-quiz data-feedback-correct="Right. The move closure takes ownership of the request and sender so the worker can use them safely." data-feedback-wrong="Follow the move closure passed to thread::spawn and check what values are used inside it.">
+        <div class="quiz-options">
+          <button class="quiz-option" data-quiz-option data-correct="true">Worker owns request data</button>
+          <button class="quiz-option" data-quiz-option>UI waits inside render</button>
+          <button class="quiz-option" data-quiz-option>Channel performs network request</button>
+        </div>
+        <button class="action-button tech-action" data-check-quiz>Check my answer</button>
+        <p class="quiz-feedback" data-quiz-feedback role="status" hidden></p>
+      </div>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Send work out; send a message back</h2>
+      <p>The app uses a standard-library thread and message-passing channel. The UI builds and validates the request, creates sender/receiver endpoints, sets a loading state, and starts a worker. The worker calls the weather service and sends either a success result or an error string. On a later UI update, <code>poll_worker</code> checks the receiver without blocking.</p>
+      <div class="trace" aria-label="Worker message flow">
+        <div class="trace-step"><strong>UI thread</strong>Build request</div>
+        <div class="trace-step"><strong>Worker thread</strong>Call blocking HTTP</div>
+        <div class="trace-step"><strong>Channel</strong>Send success or error</div>
+        <div class="trace-step"><strong>UI thread</strong>Update state</div>
+      </div>
+      <p>Think of it like sending a runner from the market stall to the depot: the stall keeps serving people while the runner returns with a receipt. This app does not use async/await for HTTP; it uses blocking reqwest inside the separate worker thread.</p>
+      <div class="callout"><strong>Pythonista lens — a thread has to receive what it uses:</strong> A Python thread can often close over names from its surrounding function, with Python's runtime managing the referenced objects. Rust makes the handoff explicit. The <code>move</code> closure takes ownership of the request and sender so the new thread has values that remain valid while it works. Rust also checks that values crossing the thread boundary satisfy its thread-safety rules. The channel is like a typed dispatch pouch: the worker can send only the message shape declared by <code>WorkerMessage</code>, and the UI checks for a message without waiting.</div>
+      <pre><code>let (tx, rx) = mpsc::channel();
+self.worker_rx = Some(rx);
+self.loading = true;
+
+thread::spawn(move || {
+    let message = match weather_service::fetch_weather(request) {
+        Ok(result) =&gt; WorkerMessage::Success(result),
+        Err(err) =&gt; WorkerMessage::Error(err),
+    };
+    let _ = tx.send(message);
+});</code></pre>
+      <p><a href="https://github.com/feenix100/rusty_weather/blob/main/src/app.rs">Open start_fetch and poll_worker</a> · <a href="https://doc.rust-lang.org/book/ch16-02-message-passing.html">Rust Book: message passing</a></p>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Practice: trace both paths</h2>
+      <ol>
+        <li>Find <code>WorkerMessage</code>. Write down its two variants.</li>
+        <li>Trace the <code>Ok</code> branch in <code>poll_worker</code>. Which state fields change after success?</li>
+        <li>Trace the <code>Err</code> branch. Does it write a weather result?</li>
+        <li>Explain what <code>move</code> changes about the closure's request and sender.</li>
+      </ol>
+      <details class="answer-note">
+        <summary>Check after your attempt</summary>
+        <p>Success clears loading, updates status and the latest result, chooses an animation, and saves a history snapshot. Error clears loading and displays the message. The closure owns the request and sender that it needs on the new thread.</p>
+      </details>
+    </section>
+
+    <section class="tech-card card-pad">
+      <h2>Watch and read</h2>
+      <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=742s">Video: background worker pattern, around 12:22</a>.</p>
+      <p>Primary references: <a href="https://doc.rust-lang.org/book/ch16-01-threads.html">Rust Book: threads</a>, <a href="https://doc.rust-lang.org/std/sync/mpsc/fn.channel.html">mpsc::channel</a>, and <a href="https://docs.rs/reqwest/latest/reqwest/blocking/">reqwest blocking</a>.</p>
+      <p class="small-note">Ask me about <code>move</code>, channels, or why this is not async/await.</p>
+    </section>
+
+    <div class="lesson-footer">
+      <button class="action-button" data-complete aria-pressed="false">Mark lesson complete</button>
+      <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a class="button-link" href="0004-validate-input.html">Previous: validate input</a>
+        <a class="button-link" href="0006-geocode-and-request.html">Next: API request</a>
+      </nav>
+    </div>
+  </main>
+  <footer class="page-width course-foot">Progress is saved locally in this browser when you choose “Mark lesson complete.”</footer>
+  <script src="../assets/course.js"></script>
+</body>
+</html>

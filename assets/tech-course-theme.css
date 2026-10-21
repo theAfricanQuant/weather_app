@@ -1,0 +1,72 @@
+/* Adapted from the Technical Study Studio theme. */
+:root {
+  --tech-ink: #142c2a;
+  --tech-forest: #173f3b;
+  --tech-pine: #0b6057;
+  --tech-coral: #ec7357;
+  --tech-sun: #f5bd3f;
+  --tech-paper: #fffaf0;
+  --tech-mist: #eaf1ed;
+  --tech-sky: #a8d8e4;
+  --tech-line: #cddbd5;
+  --tech-terminal: #102523;
+  --tech-terminal-ink: #e5f4ee;
+  --tech-terminal-muted: #9bb7ae;
+  --tech-terminal-accent: #f5bd3f;
+  --tech-body: ui-rounded, "Avenir Next", Avenir, "Trebuchet MS", sans-serif;
+  --tech-code: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+.tech-course {
+  color: var(--tech-ink);
+  background: var(--tech-paper);
+  font: 16px/1.58 var(--tech-body);
+}
+
+.tech-course__header,
+.tech-mission {
+  color: #fff;
+  background: var(--tech-forest);
+}
+
+.tech-card {
+  background: #fffdf8;
+  border: 1px solid var(--tech-line);
+  border-radius: 17px;
+  box-shadow: 0 3px 0 rgba(20, 44, 42, .03);
+}
+
+.tech-action {
+  color: #fff;
+  background: var(--tech-coral);
+  box-shadow: 0 4px 0 #b34a38;
+}
+
+.tech-lab {
+  color: var(--tech-terminal-ink);
+  background: var(--tech-terminal);
+  border-radius: 16px;
+  font-family: var(--tech-code);
+}
+
+.tech-lab__label {
+  color: var(--tech-terminal-accent);
+  font: 700 .75rem/1 var(--tech-body);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.tech-lab__output {
+  color: var(--tech-terminal-muted);
+}
+
+.tech-code {
+  overflow: auto;
+  font-family: var(--tech-code);
+  line-height: 1.55;
+}
+
+.tech-trace {
+  background: var(--tech-mist);
+  border-left: 4px solid var(--tech-sun);
+}
