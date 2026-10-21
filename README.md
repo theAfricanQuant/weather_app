@@ -10,7 +10,9 @@ Readers can open that site directly in a browser; they do not need to clone the 
 
 ## Start the crate in this folder
 
-Open Tuxedo OS Terminal and move to the project folder:
+These terminal commands show my setup, Ricky, on Tuxedo OS. If you clone this repository on another computer, operating system, or into a different folder, replace the example absolute path below with the absolute path to your own checkout.
+
+Open Tuxedo OS Terminal and move to my project folder:
 
 ```bash
 cd "/home/siseng/Documents/08_Personal/programing_languages/Rust/weather_app"
