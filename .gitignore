@@ -1,2 +1,5 @@
 /target/
 /_site/
+
+# Reference implementation, cloned locally for reading. Not part of the course.
+/source/
