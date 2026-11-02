@@ -31,6 +31,25 @@
     </section>
 
     <section class="tech-card card-pad">
+      <h2>How we check each stage</h2>
+      <p>After an edit, <code>cargo check</code> asks Rust to check the code and types without running the program. After a code-along, <code>cargo run</code> both compiles and runs it, so we can compare the output with the lesson. A successful run is our first smoke check; we will add automated tests for reusable functions as we reach them.</p>
+      <p>The current crate does not yet have <code>#[test]</code> functions, so <code>cargo test</code> would not verify these behaviors yet. We will add automated checks for input validation; until then, use the specific examples below and inspect their output.</p>
+      <ol>
+        <li><strong>Lesson 1 — crate starts:</strong> run <code>cargo run</code>; expect “Weather app crate is running!”.</li>
+        <li><strong>Lesson 2 — request model:</strong> run <code>cargo run</code>; expect the nested Lagos request. The unused-field warnings are expected at this stage.</li>
+        <li><strong>Lesson 3 — app state:</strong> run <code>cargo run</code>; check that the first print has <code>latest_result: None</code> and the updated print has <code>Some(...)</code>.</li>
+        <li><strong>Lesson 4 — validation:</strong> run <code>cargo run</code>; <code>6.52</code> should parse, <code>west</code> should return an error, and latitude <code>120.0</code> should be rejected as out of range.</li>
+        <li><strong>Lesson 5 — worker message:</strong> run <code>cargo run --bin lesson_05</code>; expect the worker's success message to arrive through the channel.</li>
+        <li><strong>Lesson 6 — location route:</strong> run <code>cargo run --bin lesson_06</code> with coordinates, then switch to the city/state variant and run again; each should take its own <code>match</code> branch.</li>
+        <li><strong>Lesson 7 — normalize data:</strong> run <code>cargo run --bin lesson_07</code>; inspect the normalized record for a present temperature and a missing value represented by <code>None</code>. This example uses mock, already-decoded data, not a live API.</li>
+        <li><strong>Lesson 8 — render state:</strong> run <code>cargo run --bin lesson_08</code>; expect one message for no result and another for a loaded result.</li>
+        <li><strong>Lesson 9 — save history:</strong> run <code>cargo run --bin lesson_09</code>, then inspect <code>weather-history.txt</code> in the project folder.</li>
+        <li><strong>Lesson 10 — fixed array:</strong> run <code>cargo run --bin lesson_10</code>; after adding a fifth city, update the declared array length and run again. As a deliberate compiler experiment, make the length disagree and use <code>cargo check --bin lesson_10</code>; then undo the mismatch.</li>
+      </ol>
+      <div class="callout"><strong>What these checks tell us:</strong> <code>cargo check</code> catches code and type problems; running the program lets us verify visible behavior. A compiler warning is not a failed stage if Cargo still finishes and the output matches. The later worker, normalization, rendering, and history steps are small learning programs, not yet one integrated live-weather GUI.</div>
+    </section>
+
+    <section class="tech-card card-pad">
       <h2>Before the explanation</h2>
       <p><code>parse_date_range</code> returns a <code>Result</code>. What should it return when both dates parse and the start is not after the end?</p>
       <div data-quiz data-feedback-correct="Yes. Ok carries the successfully parsed date pair; Err carries a message when validation fails." data-feedback-wrong="Remember: Result has Ok for a value and Err for a failure. Option represents presence or absence.">
