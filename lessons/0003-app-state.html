@@ -133,6 +133,17 @@ impl AppState {
         }
     }
 }</code></pre>
+      <div class="callout">
+        <strong>What this <code>AppState</code> code does:</strong>
+        <ul>
+          <li><code>use crate::models::WeatherQueryResult;</code> brings the result type from this crate's <code>models</code> module into this file.</li>
+          <li><code>#[derive(Debug)]</code> asks Rust to generate a useful debug-print format, so we can inspect the state with <code>println!</code>.</li>
+          <li><code>struct AppState</code> groups the input, loading flag, optional result, and status message. The <code>pub</code> fields are accessible from another module, such as <code>main.rs</code>; changing them also requires a mutable binding like <code>let mut state</code>.</li>
+          <li><code>impl AppState</code> attaches a method to this type. <code>new()</code> is our constructor: it creates and returns an initial <code>AppState</code>. <code>Self</code> means the <code>AppState</code> type.</li>
+          <li>The initial values say: search for Lagos, nothing is loading, no result exists yet (<code>None</code>), and the app is ready. <code>String::from</code> creates owned Rust strings for the text fields.</li>
+        </ul>
+        <p>This code only creates local state; it does not fetch weather. In Python terms, picture a dataclass plus a factory method that returns a ready-to-use instance.</p>
+      </div>
       <p>Now replace all of <code>src/main.rs</code> with this, using <code>Esc</code>, <code>gg</code>, <code>dG</code>, <code>i</code>, <strong>Edit → Paste</strong>, then <code>Esc</code>, <code>:w</code>, <code>Enter</code>:</p>
       <pre><code>mod app_state;
 mod models;
