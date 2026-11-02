@@ -208,6 +208,20 @@ fn main() {
     </section>
 
     <section class="tech-card card-pad">
+      <h2>What changed in the three files, and why?</h2>
+      <p>Lesson 3's <code>main.rs</code> filled <code>latest_result</code> with a made-up weather value so we could see app state change. Lesson 4 replaces that demonstration with the earlier step in a real app flow: check input first, then build a typed request only when the input is valid.</p>
+      <h3><code>src/input.rs</code>: turn text into checked numbers</h3>
+      <p><code>parse_coordinate</code> is a private helper shared by the public latitude and longitude functions. It trims whitespace, tries to parse the text as <code>f64</code>, turns a parsing failure into a friendly message with <code>map_err</code>, and uses <code>?</code> to return that error immediately. If parsing succeeds, the inclusive range check rejects a value outside the allowed bounds. The wrapper functions supply the right range and label, so callers cannot accidentally use the longitude limit for latitude.</p>
+      <p><code>&amp;str</code> is borrowed text: the function reads the caller's string for the duration of the call instead of taking ownership or making a copy. It returns <code>Result&lt;f64, String&gt;</code>, so the caller must handle either a number or an error message.</p>
+      <h3><code>src/app_state.rs</code>: keep the request separate from the result</h3>
+      <p>We added <code>request: Option&lt;WeatherQueryRequest&gt;</code> because a request does not exist until validation succeeds. It begins as <code>None</code> and becomes <code>Some(request)</code> after both coordinates pass. <code>latest_result</code> remains a separate optional field for weather data that may arrive later. A request is what we plan to ask; a result is what comes back.</p>
+      <h3><code>src/main.rs</code>: connect the steps</h3>
+      <p><code>mod input;</code> tells Rust to include <code>src/input.rs</code> in this crate. The <code>use</code> lines bring the model names into scope. The loop demonstrates three inputs: a valid number, non-numeric text, and a number outside the latitude range.</p>
+      <p>Then <code>match (latitude, longitude)</code> checks both <code>Result</code> values together. Only the <code>(Ok(latitude), Ok(longitude))</code> arm constructs a <code>WeatherQueryRequest</code> with the <code>Coordinates</code> variant. If either parse fails, the other arm puts the error in <code>state.status</code>. This is the guard that keeps invalid text from becoming a typed request.</p>
+      <div class="callout"><strong>What the successful run proves:</strong> The examples printed the expected <code>Ok</code> and <code>Err</code> values, and the final state contains a request for latitude <code>6.52</code> and longitude <code>3.38</code>. This is still a local demonstration: we built the request value, but did not send it to a weather service.</div>
+    </section>
+
+    <section class="tech-card card-pad">
       <h2>Watch and read</h2>
       <p><a href="https://www.youtube.com/watch?v=z6_rRxLwu0Y&amp;t=905s" target="_blank" rel="noopener noreferrer">Video: input validation and dates, around 15:05</a>.</p>
       <p>Primary references: <a href="https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html" target="_blank" rel="noopener noreferrer">Rust Book: Result</a> and <a href="https://docs.rs/chrono/latest/chrono/naive/struct.NaiveDate.html" target="_blank" rel="noopener noreferrer">Chrono NaiveDate</a>. Next: <a href="0005-background-worker.html" target="_blank" rel="noopener noreferrer">keep the GUI responsive during the request</a>.</p>
