@@ -18,6 +18,19 @@
   </header>
   <main class="page-width page-main lesson-body">
     <section class="tech-card card-pad">
+      <h2>Quick recap: what you have built so far</h2>
+      <p>You already have a Cargo project and a small Rust program. This is a good place to pause and connect the pieces before adding more.</p>
+      <ul>
+        <li><code>cargo run</code> asks Cargo to compile your crate and then run the program. The compiler checks the Rust types as it builds.</li>
+        <li><code>src/main.rs</code> is the entry point of this binary crate. <code>mod models;</code> tells Rust to include <code>src/models.rs</code>; <code>use</code> brings chosen names into the current file.</li>
+        <li><code>LocationQuery</code> is an enum, so a location is one allowed shape: a city/state pair or coordinates. <code>WeatherQueryRequest</code> is a struct that bundles a location with two dates.</li>
+        <li>Your <code>main</code> function creates a sample request for Lagos and prints its structure with <code>Debug</code>. That is a data-model demonstration; it does not call a live weather service.</li>
+        <li>The compiler warnings are expected here: some fields and the coordinates option have not yet been used by app behavior. The program still compiled and ran.</li>
+      </ul>
+      <div class="callout"><strong>Pythonista reminder:</strong> Think of the enum as a checked choice between shapes, and the struct as a typed record. Python can represent similar data with classes or dictionaries, but Rust checks these declared shapes while compiling.</div>
+    </section>
+
+    <section class="tech-card card-pad">
       <h2>Before the explanation</h2>
       <p>When the window first opens, what is <code>latest_result</code>?</p>
       <div data-quiz data-feedback-correct="Correct. There is no fetched weather result at startup, so the state is represented by None." data-feedback-wrong="Find the field type and the constructor value in CyberWeatherApp::new.">
