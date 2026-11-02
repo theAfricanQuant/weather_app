@@ -138,7 +138,7 @@ impl AppState {
         <ul>
           <li><code>use crate::models::WeatherQueryResult;</code> brings the result type from this crate's <code>models</code> module into this file.</li>
           <li><code>#[derive(Debug)]</code> asks Rust to generate a useful debug-print format, so we can inspect the state with <code>println!</code>.</li>
-          <li><code>struct AppState</code> groups the input, loading flag, optional result, and status message. The <code>pub</code> fields are accessible from another module, such as <code>main.rs</code>; changing them also requires a mutable binding like <code>let mut state</code>.</li>
+          <li><code>pub struct AppState</code> groups the input, loading flag, optional result, and status message, and makes the type name accessible outside this module. That <code>pub</code> does not automatically expose the fields; each field needs its own <code>pub</code>. Changing a field also requires a mutable binding like <code>let mut state</code>.</li>
           <li><code>impl AppState</code> attaches a method to this type. <code>new()</code> is our constructor: it creates and returns an initial <code>AppState</code>. <code>Self</code> means the <code>AppState</code> type.</li>
           <li>The initial values say: search for Lagos, nothing is loading, no result exists yet (<code>None</code>), and the app is ready. <code>String::from</code> creates owned Rust strings for the text fields.</li>
         </ul>
