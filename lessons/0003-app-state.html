@@ -28,6 +28,16 @@
         <li>The compiler warnings are expected here: some fields and the coordinates option have not yet been used by app behavior. The program still compiled and ran.</li>
       </ul>
       <div class="callout"><strong>Pythonista reminder:</strong> Think of the enum as a checked choice between shapes, and the struct as a typed record. Python can represent similar data with classes or dictionaries, but Rust checks these declared shapes while compiling.</div>
+      <div class="callout">
+        <strong>What does <code>struct</code> mean?</strong>
+        <p>A <code>struct</code> defines a new type that groups named fields which belong together. Our <code>WeatherQueryRequest</code> type has a location, a start date, and an end date. In Python, a <code>dataclass</code> is a close comparison.</p>
+        <pre><code>struct WeatherQueryRequest {
+    location: LocationQuery,
+    start_date: String,
+    end_date: String,
+}</code></pre>
+        <p>This declaration describes the shape; <code>let request = WeatherQueryRequest { ... };</code> creates one value with actual data in those fields. Rust checks that the required fields are present and have the declared types. An enum like <code>LocationQuery</code> serves a different purpose: it chooses one of several allowed variants.</p>
+      </div>
     </section>
 
     <section class="tech-card card-pad">
