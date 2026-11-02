@@ -37,6 +37,7 @@
     end_date: String,
 }</code></pre>
         <p>This declaration describes the shape; <code>let request = WeatherQueryRequest { ... };</code> creates one value with actual data in those fields. Rust checks that the required fields are present and have the declared types. An enum like <code>LocationQuery</code> serves a different purpose: it chooses one of several allowed variants.</p>
+        <p>A <code>struct</code> is about the data a thing holds. Python's <code>def</code> defines a function that performs an action; Rust uses <code>fn</code> for that. Python's <code>@dataclass</code> is a closer comparison to a Rust struct. In Rust, an <code>impl</code> block can attach functions such as <code>AppState::new()</code> to a struct: the struct declares the shape, and the function builds or works with values of that shape.</p>
       </div>
     </section>
 
