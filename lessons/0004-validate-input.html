@@ -203,22 +203,35 @@ fn main() {
     println!("Request state:\n{state:#?}");
 }</code></pre>
       <p>Save the files and run <code>cargo run</code>. You should see <code>6.52</code> accepted, <code>west</code> rejected as non-numeric, and <code>120.0</code> rejected as an invalid latitude. Then the final state contains a coordinate-based request.</p>
-      <div class="callout"><strong>Why are there still warnings?</strong> The <code>dead_code</code> warnings are expected in this staged learning app: some fields and model variants are waiting for later lessons to use them. Rust intentionally does not count a derived <code>Debug</code> print as the program reading those fields. For example, the latitude and longitude show in the printed request, but we have not yet used them to make a weather request. Cargo can finish successfully with these warnings; the checks above tell us whether Lesson 4 works.</div>
-      <div class="callout"><strong>Rust and Python side by side:</strong> Python might parse with <code>float(raw)</code> and catch <code>ValueError</code>. Here the return type <code>Result&lt;f64, String&gt;</code> makes success or failure part of the function's contract. The <code>? </code> operator returns early if parsing fails; <code>map_err</code> turns the parser's technical error into a helpful message. We validate before putting coordinates into the request, like checking a danfo passenger's destination before issuing the ticket.</div>
+      <div class="callout"><strong>Why are there still warnings?</strong> These warnings are reminders that some parts of the app are waiting for later lessons. For example, we have not used <code>input_location</code> or <code>loading</code> yet. Rust also does not count the pretty <code>Debug</code> print as using a field in the app's logic. Printing a value helps us look at it; later, the program will need to read values to make decisions or contact a weather service. The warnings are not errors, so Cargo can still finish successfully.</div>
+      <div class="callout"><strong>Python connection:</strong> In Python, you might call <code>float(raw)</code> and catch a <code>ValueError</code>. Rust returns a <code>Result</code>: either <code>Ok(number)</code> or <code>Err(message)</code>. The <code>?</code> means “if this failed, return the error now.” We check the coordinates before building the request, like a conductor checking a passenger's destination before issuing a ticket.</div>
     </section>
 
     <section class="tech-card card-pad">
       <h2>What changed in the three files, and why?</h2>
-      <p>Lesson 3's <code>main.rs</code> filled <code>latest_result</code> with a made-up weather value so we could see app state change. Lesson 4 replaces that demonstration with the earlier step in a real app flow: check input first, then build a typed request only when the input is valid.</p>
-      <h3><code>src/input.rs</code>: turn text into checked numbers</h3>
-      <p><code>parse_coordinate</code> is a private helper shared by the public latitude and longitude functions. It trims whitespace, tries to parse the text as <code>f64</code>, turns a parsing failure into a friendly message with <code>map_err</code>, and uses <code>?</code> to return that error immediately. If parsing succeeds, the inclusive range check rejects a value outside the allowed bounds. The wrapper functions supply the right range and label, so callers cannot accidentally use the longitude limit for latitude.</p>
-      <p><code>&amp;str</code> is borrowed text: the function reads the caller's string for the duration of the call instead of taking ownership or making a copy. It returns <code>Result&lt;f64, String&gt;</code>, so the caller must handle either a number or an error message.</p>
-      <h3><code>src/app_state.rs</code>: keep the request separate from the result</h3>
-      <p>We added <code>request: Option&lt;WeatherQueryRequest&gt;</code> because a request does not exist until validation succeeds. It begins as <code>None</code> and becomes <code>Some(request)</code> after both coordinates pass. <code>latest_result</code> remains a separate optional field for weather data that may arrive later. A request is what we plan to ask; a result is what comes back.</p>
-      <h3><code>src/main.rs</code>: connect the steps</h3>
-      <p><code>mod input;</code> tells Rust to include <code>src/input.rs</code> in this crate. The <code>use</code> lines bring the model names into scope. The loop demonstrates three inputs: a valid number, non-numeric text, and a number outside the latitude range.</p>
-      <p>Then <code>match (latitude, longitude)</code> checks both <code>Result</code> values together. Only the <code>(Ok(latitude), Ok(longitude))</code> arm constructs a <code>WeatherQueryRequest</code> with the <code>Coordinates</code> variant. If either parse fails, the other arm puts the error in <code>state.status</code>. This is the guard that keeps invalid text from becoming a typed request.</p>
-      <div class="callout"><strong>What the successful run proves:</strong> The examples printed the expected <code>Ok</code> and <code>Err</code> values, and the final state contains a request for latitude <code>6.52</code> and longitude <code>3.38</code>. This is still a local demonstration: we built the request value, but did not send it to a weather service.</div>
+      <p>In Lesson 3, <code>main.rs</code> made up a weather result so we could watch the app state change. In Lesson 4, we step back to an earlier part of the journey: check the location first, then prepare a request. We have not contacted a weather service yet.</p>
+
+      <h3>1. <code>src/input.rs</code>: check the numbers</h3>
+      <p>A text box gives us text, even when the text looks like a number. The app must check that text before using it as a latitude or longitude. The helper function <code>parse_coordinate</code> does the shared work:</p>
+      <ol>
+        <li><code>trim()</code> removes spaces around the text.</li>
+        <li><code>.parse::&lt;f64&gt;()</code> tries to turn it into a decimal number. <code>f64</code> is Rust's type for this kind of number.</li>
+        <li><code>map_err</code> changes a technical parsing failure into a message a person can understand.</li>
+        <li><code>?</code> means “if parsing failed, stop here and return that error.”</li>
+        <li>The range check makes sure the number is allowed. The <code>..=</code> includes both ends of the range.</li>
+        <li><code>Ok(value)</code> returns the number after it passes both checks.</li>
+      </ol>
+      <p>The helper is used by two small functions: latitude must be from <code>-90</code> to <code>90</code>; longitude must be from <code>-180</code> to <code>180</code>. That way, we write the checking steps once and give each kind of coordinate its own correct limits.</p>
+      <p><code>&amp;str</code> means the function borrows the text: it can read the text while it works, but it does not take the text away from the caller. The result is either <code>Ok(number)</code> or <code>Err(message)</code>. Rust makes us handle both possibilities.</p>
+
+      <h3>2. <code>src/app_state.rs</code>: save a request only after it passes</h3>
+      <p>We added <code>request: Option&lt;WeatherQueryRequest&gt;</code>. <code>Option</code> means “there may be a value, or there may be no value.” The request starts as <code>None</code> because we have not checked any coordinates yet. After both coordinates pass, it becomes <code>Some(request)</code>.</p>
+      <p>The request and the result are different things. <code>request</code> is what the app plans to ask for. <code>latest_result</code> is where weather data can go after a service answers. Keeping two fields helps us track those two steps separately.</p>
+
+      <h3>3. <code>src/main.rs</code>: join the steps together</h3>
+      <p><code>mod input;</code> tells Rust to include the new <code>input.rs</code> file. The <code>use</code> lines let us write model names without their longer paths. The loop tries three examples so we can see one success and two different errors.</p>
+      <p>Next, <code>match (latitude, longitude)</code> checks both results. If both are <code>Ok</code>, the app builds a <code>WeatherQueryRequest</code> with the <code>Coordinates</code> location and saves it in <code>state.request</code>. If either one is an <code>Err</code>, the app saves the error in <code>state.status</code>. This is the gate that stops bad text from becoming a request.</p>
+      <div class="callout"><strong>Reading your output:</strong> <code>6.52</code> became <code>Ok(6.52)</code>. <code>west</code> became an error because it is not a number. <code>120.0</code> became an error because it is too large for latitude. The final state shows a request using latitude <code>6.52</code> and longitude <code>3.38</code>. This is a practice example: the app made the request value, but did not send it to a real weather service.</div>
     </section>
 
     <section class="tech-card card-pad">
