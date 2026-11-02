@@ -18,6 +18,19 @@
   </header>
   <main class="page-width page-main lesson-body">
     <section class="tech-card card-pad">
+      <h2>Course compass: what are we building?</h2>
+      <p>We are growing a small Rust learning project around a weather lookup so you can understand how a crate is scaffolded and how its parts fit together. The upstream weather app is our reference for the flow; we are not copying its finished GUI wholesale.</p>
+      <ol>
+        <li>Set up and run a Cargo binary crate.</li>
+        <li>Model a weather request with Rust types, then group changing values in app state.</li>
+        <li>Validate text before turning it into a typed request. That is this lesson's focus.</li>
+        <li>Study the later steps of the flow: background work, API data, rendering, and saved history.</li>
+      </ol>
+      <p>Some later topics use small runnable examples to isolate one Rust idea at a time. That is practice scaffolding; it does not mean we already have a complete GUI or live weather service.</p>
+      <div class="callout"><strong>Where you are now:</strong> Your current crate has the request model and prints a sample Lagos request. This lesson's code-along builds on Lesson 3's <code>AppState</code>. If you have not added that yet, go back to <a href="0003-app-state.html" target="_blank" rel="noopener noreferrer">Lesson 3</a> first, then return here.</div>
+    </section>
+
+    <section class="tech-card card-pad">
       <h2>Before the explanation</h2>
       <p><code>parse_date_range</code> returns a <code>Result</code>. What should it return when both dates parse and the start is not after the end?</p>
       <div data-quiz data-feedback-correct="Yes. Ok carries the successfully parsed date pair; Err carries a message when validation fails." data-feedback-wrong="Remember: Result has Ok for a value and Err for a failure. Option represents presence or absence.">
