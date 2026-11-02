@@ -203,6 +203,7 @@ fn main() {
     println!("Request state:\n{state:#?}");
 }</code></pre>
       <p>Save the files and run <code>cargo run</code>. You should see <code>6.52</code> accepted, <code>west</code> rejected as non-numeric, and <code>120.0</code> rejected as an invalid latitude. Then the final state contains a coordinate-based request.</p>
+      <div class="callout"><strong>Why are there still warnings?</strong> The <code>dead_code</code> warnings are expected in this staged learning app: some fields and model variants are waiting for later lessons to use them. Rust intentionally does not count a derived <code>Debug</code> print as the program reading those fields. For example, the latitude and longitude show in the printed request, but we have not yet used them to make a weather request. Cargo can finish successfully with these warnings; the checks above tell us whether Lesson 4 works.</div>
       <div class="callout"><strong>Rust and Python side by side:</strong> Python might parse with <code>float(raw)</code> and catch <code>ValueError</code>. Here the return type <code>Result&lt;f64, String&gt;</code> makes success or failure part of the function's contract. The <code>? </code> operator returns early if parsing fails; <code>map_err</code> turns the parser's technical error into a helpful message. We validate before putting coordinates into the request, like checking a danfo passenger's destination before issuing the ticket.</div>
     </section>
 
