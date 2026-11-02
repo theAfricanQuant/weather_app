@@ -10,3 +10,9 @@ pub struct WeatherQueryRequest {
     pub start_date: String,
     pub end_date: String,
 }
+
+#[derive(Debug)]
+pub struct WeatherQueryResult {
+    pub location: String,
+    pub temperature_c: Option<f64>,
+}

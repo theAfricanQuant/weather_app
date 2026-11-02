@@ -1,16 +1,18 @@
+mod app_state;
 mod models;
 
-use models::{LocationQuery, WeatherQueryRequest};
+use app_state::AppState;
+use models::WeatherQueryResult;
 
 fn main() {
-    let request = WeatherQueryRequest {
-        location: LocationQuery::CityState {
-            city: String::from("Lagos"),
-            state: String::from("Lagos"),
-        },
-        start_date: String::from("2026-10-21"),
-        end_date: String::from("2026-10-22"),
-    };
+    let mut state = AppState::new();
+    println!("Starting state:\n{state:#?}");
 
-    println!("{request:#?}");
+    state.latest_result = Some(WeatherQueryResult {
+        location: String::from("Lagos, Nigeria"),
+        temperature_c: Some(31.0),
+    });
+    state.status = String::from("Weather loaded");
+
+    println!("Updated state:\n{state:#?}");
 }
